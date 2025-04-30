@@ -1,0 +1,25 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Rango in Natura – Pronta Entrega</title>
+  <!-- Milligram CSS + Roboto -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Pronta Entrega Rango in Natura</h1>
+    <div id="grid" class="grid"></div>
+    <div id="summary" class="summary">
+      <p>Total: <strong id="total">R$ 0,00</strong></p>
+      <button id="generate" class="button-primary">Gerar Pedido</button>
+    </div>
+    <textarea id="order-text" placeholder="Seu pedido aparecerá aqui…" readonly rows="6"></textarea>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
