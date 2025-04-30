@@ -53,36 +53,63 @@ h1 {
   font-size: 0.9rem;
 }
 
-/* controle de quantidade */
+/* === Botões de quantidade modernizados === */
 .qty-control {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   margin-top: 0.5rem;
 }
 
 .qty-btn {
-  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 2.5rem;
   height: 2.5rem;
   min-width: 44px;   /* alvo mínimo de toque */
   min-height: 44px;
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border: 2px solid var(--brand-orange);
+  border-radius: 50%;
   background: #fff;
-  border-radius: 4px;
-  line-height: 1;
+  color: var(--brand-orange);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+  outline: none;
 }
 
-.qty-btn:active {
-  transform: scale(0.95);
+/* botões coloridos de acordo com a ação */
+.qty-btn.minus { 
+  border-color: var(--brand-orange);
+  color: var(--brand-orange);
+}
+.qty-btn.plus { 
+  border-color: var(--brand-green);
+  color: var(--brand-green);
 }
 
+/* estado de hover/focus */
+.qty-btn:hover,
+.qty-btn:focus {
+  transform: scale(1.1);
+}
+.qty-btn.minus:hover {
+  background: var(--brand-orange);
+  color: #fff;
+}
+.qty-btn.plus:hover {
+  background: var(--brand-green);
+  color: #fff;
+}
+
+/* espaçamento do display entre os botões */
 .qty-display {
   margin: 0 0.5rem;
   width: 1.5rem;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 /* summary fica column no mobile */
