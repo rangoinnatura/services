@@ -1,5 +1,5 @@
 // script.js
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M/gviz/tq?tqx=out:json'; 
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRI_LQryJqqRXVEHHajA2uyawrNZnh1remU5cD1Nvg5N3h-AyGmx9_ZthUrjGOZ0RskcQFh2_Cx2u8O/pubhtml?gid=0&single=true'; 
 // 1) Publique a Sheet como JSON e cole o link acima.
 // 2) A resposta vem com prefixo "/*O_o*/", vamos removê-lo.
 
