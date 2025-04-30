@@ -1,7 +1,5 @@
 // script.js
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRI_LQryJqqRXVEHHajA2uyawrNZnh1remU5cD1Nvg5N3h-AyGmx9_ZthUrjGOZ0RskcQFh2_Cx2u8O/pubhtml?gid=0&single=true'; 
-// 1) Publique a Sheet como JSON e cole o link acima.
-// 2) A resposta vem com prefixo "/*O_o*/", vamos removê-lo.
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRI_LQryJqqRXVEHHajA2uyawrNZnh1remU5cD1Nvg5N3h-AyGmx9_ZthUrjGOZ0RskcQFh2_Cx2u8O/gviz/tq?gid=0&tqx=out:json';
 
 let items = [];
 const gridEl   = document.getElementById('grid');
@@ -23,7 +21,7 @@ function calcTotal() {
 }
 
 function generateOrder() {
-  let lines = ['Pedido Rango in Natura:'];
+  const lines = ['Pedido Rango in Natura:'];
   items.forEach(it => {
     const qty = parseInt(document.getElementById(`qty-${it.id}`).value) || 0;
     if (qty > 0) {
@@ -66,21 +64,25 @@ function fetchSheet() {
   fetch(SHEET_URL)
     .then(r => r.text())
     .then(txt => {
-      const json = JSON.parse(txt.substring(txt.indexOf('{')));
-      const rows = json.table.rows;
+      const jsonText = txt.substring(
+        txt.indexOf('{'),
+        txt.lastIndexOf('}') + 1
+      );
+      const data = JSON.parse(jsonText);
+      const rows = data.table.rows;
       items = rows.map((r, i) => ({
         id:      i,
         protein: r.c[0]?.v || '',
         side:    r.c[1]?.v || '',
         price:   parseFloat(r.c[2]?.v) || 0,
-        stock:   parseInt(r.c[3]?.v) || 0
+        stock:   parseInt(r.c[3]?.v)   || 0
       }));
       renderItems();
     })
     .catch(err => console.error('Erro ao buscar Sheet:', err));
 }
 
-// bind events
+// eventos
 genBtn.addEventListener('click', generateOrder);
 
 // inicializa
