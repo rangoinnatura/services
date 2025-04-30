@@ -1,6 +1,5 @@
 // script.js
 
-// 1) ID real da sua planilha
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M'; 
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
@@ -14,28 +13,36 @@ function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// retorna "Proteína + Acompanhamento" só se ambos existirem
 function getItemName(item) {
   if (item.protein && item.side) {
     return `${item.protein} + ${item.side}`;
   }
-  // se tiver só um dos dois, devolve ele; senão, string vazia
   return item.protein || item.side || '';
 }
 
+// atualiza total lendo do display de cada card
 function calcTotal() {
   let sum = 0;
   items.forEach(it => {
-    const qty = parseInt(document.getElementById(`qty-${it.id}`).value) || 0;
+    const qty = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
     sum += qty * it.price;
   });
   totalEl.textContent = formatBRL(sum);
 }
 
+// +1 / -1 no display
+function updateQty(id, delta) {
+  const el = document.getElementById(`qty-${id}`);
+  let qty = parseInt(el.textContent) || 0;
+  qty = Math.max(0, qty + delta);
+  el.textContent = qty;
+  calcTotal();
+}
+
 function generateOrder() {
   const lines = ['Pedido Rango in Natura:'];
   items.forEach(it => {
-    const qty = parseInt(document.getElementById(`qty-${it.id}`).value) || 0;
+    const qty = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
     if (qty > 0) {
       lines.push(`• ${qty}x ${getItemName(it)}`);
     }
@@ -54,21 +61,22 @@ function renderItems() {
       <h2>${getItemName(it)}</h2>
       <p>Preço: ${formatBRL(it.price)}</p>
       <p>Em estoque: ${it.stock}</p>
-      <label>
-        Qtd:
-        <input
-          type="number"
-          id="qty-${it.id}"
-          min="0"
-          max="${it.stock}"
-          value="0"
-        />
-      </label>
+      <div class="qty-control">
+        <button class="qty-btn minus" data-id="${it.id}">–</button>
+        <span id="qty-${it.id}" class="qty-display">0</span>
+        <button class="qty-btn plus"  data-id="${it.id}">+</button>
+      </div>
     `;
     gridEl.appendChild(card);
-    document
-      .getElementById(`qty-${it.id}`)
-      .addEventListener('input', calcTotal);
+
+    card.querySelector(`.qty-btn.minus`).addEventListener('click', () => {
+      updateQty(it.id, -1);
+    });
+    card.querySelector(`.qty-btn.plus`).addEventListener('click', () => {
+      // não deixa passar do estoque
+      const current = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
+      if (current < it.stock) updateQty(it.id, +1);
+    });
   });
 }
 
@@ -76,7 +84,6 @@ function fetchSheet() {
   fetch(SHEET_URL)
     .then(r => r.text())
     .then(txt => {
-      // console.log(txt); // descomenta pra debugar o raw
       const jsonText = txt.substring(
         txt.indexOf('{'),
         txt.lastIndexOf('}') + 1
@@ -97,6 +104,5 @@ function fetchSheet() {
     .catch(err => console.error('Erro ao buscar Sheet:', err));
 }
 
-// liga o botão e carrega tudo
 genBtn.addEventListener('click', generateOrder);
 fetchSheet();
