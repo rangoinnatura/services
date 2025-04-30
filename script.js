@@ -1,6 +1,7 @@
 // script.js
-// certo: gviz/tq?out:json
-const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M'; 
+
+// 1) Pegue o ID real da sua planilha
+const SPREADSHEET_ID = '1AbCDef_…'; 
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
@@ -66,12 +67,16 @@ function fetchSheet() {
   fetch(SHEET_URL)
     .then(r => r.text())
     .then(txt => {
+      // DEBUG: descomente se quiser ver o raw
+      // console.log(txt);
       const jsonText = txt.substring(
         txt.indexOf('{'),
         txt.lastIndexOf('}') + 1
       );
       const data = JSON.parse(jsonText);
-      const rows = data.table.rows;
+      return data.table.rows;
+    })
+    .then(rows => {
       items = rows.map((r, i) => ({
         id:      i,
         protein: r.c[0]?.v || '',
@@ -84,8 +89,8 @@ function fetchSheet() {
     .catch(err => console.error('Erro ao buscar Sheet:', err));
 }
 
-// eventos
+// liga o botão
 genBtn.addEventListener('click', generateOrder);
 
-// inicializa
+// start
 fetchSheet();
