@@ -1,6 +1,6 @@
 // script.js
 
-// 1) Pegue o ID real da sua planilha
+// 1) ID real da sua planilha
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M'; 
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
@@ -12,6 +12,15 @@ const outputEl = document.getElementById('order-text');
 
 function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// retorna "Proteína + Acompanhamento" só se ambos existirem
+function getItemName(item) {
+  if (item.protein && item.side) {
+    return `${item.protein} + ${item.side}`;
+  }
+  // se tiver só um dos dois, devolve ele; senão, string vazia
+  return item.protein || item.side || '';
 }
 
 function calcTotal() {
@@ -28,7 +37,7 @@ function generateOrder() {
   items.forEach(it => {
     const qty = parseInt(document.getElementById(`qty-${it.id}`).value) || 0;
     if (qty > 0) {
-      lines.push(`• ${qty}x ${it.protein} + ${it.side}`);
+      lines.push(`• ${qty}x ${getItemName(it)}`);
     }
   });
   lines.push(`Total: ${totalEl.textContent}`);
@@ -42,7 +51,7 @@ function renderItems() {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <h2>${it.protein} + ${it.side}</h2>
+      <h2>${getItemName(it)}</h2>
       <p>Preço: ${formatBRL(it.price)}</p>
       <p>Em estoque: ${it.stock}</p>
       <label>
@@ -67,8 +76,7 @@ function fetchSheet() {
   fetch(SHEET_URL)
     .then(r => r.text())
     .then(txt => {
-      // DEBUG: descomente se quiser ver o raw
-      // console.log(txt);
+      // console.log(txt); // descomenta pra debugar o raw
       const jsonText = txt.substring(
         txt.indexOf('{'),
         txt.lastIndexOf('}') + 1
@@ -89,8 +97,6 @@ function fetchSheet() {
     .catch(err => console.error('Erro ao buscar Sheet:', err));
 }
 
-// liga o botão
+// liga o botão e carrega tudo
 genBtn.addEventListener('click', generateOrder);
-
-// start
 fetchSheet();
