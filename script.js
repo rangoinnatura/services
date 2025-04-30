@@ -1,7 +1,7 @@
 // script.js
 
 // 1) Pegue o ID real da sua planilha
-const SPREADSHEET_ID = '1AbCDef_…'; 
+const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M'; 
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
