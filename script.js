@@ -1,5 +1,7 @@
 // script.js
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRI_LQryJqqRXVEHHajA2uyawrNZnh1remU5cD1Nvg5N3h-AyGmx9_ZthUrjGOZ0RskcQFh2_Cx2u8O/gviz/tq?gid=0&tqx=out:json';
+// certo: gviz/tq?out:json
+const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M'; 
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 const gridEl   = document.getElementById('grid');
