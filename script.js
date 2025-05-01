@@ -12,42 +12,41 @@ const outputEl = document.getElementById('order-text');
 // cria botão de copiar abaixo do textarea
 const copyBtn = document.createElement('button');
 copyBtn.textContent = 'Copiar pedido';
-copyBtn.className = 'button-secondary';
-copyBtn.style.marginTop = '0.5rem';
+copyBtn.className   = 'button-secondary';
 copyBtn.style.width = '100%';
+copyBtn.style.marginTop = '0.5rem';
 copyBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
       copyBtn.textContent = 'Copiado!';
-      setTimeout(() => (copyBtn.textContent = 'Copiar pedido'), 2000);
+      setTimeout(() => copyBtn.textContent = 'Copiar pedido', 2000);
     })
     .catch(err => console.error('Erro ao copiar:', err));
 });
 outputEl.parentNode.insertBefore(copyBtn, outputEl.nextSibling);
 
-function formatBRL(v) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function formatBRL(value) {
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 function getItemName(item) {
-  if (item.protein && item.side) {
-    return `${item.protein} + ${item.side}`;
-  }
-  return item.protein || item.side || '';
+  return item.protein && item.side
+    ? `${item.protein} + ${item.side}`
+    : (item.protein || item.side || '');
 }
 
 function calcTotal() {
   let sum = 0;
-  items.forEach(it => {
-    const qty = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
-    sum += qty * it.price;
+  items.forEach(item => {
+    const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
+    sum += qty * item.price;
   });
   totalEl.textContent = formatBRL(sum);
 }
 
 function updateQty(id, delta) {
   const el = document.getElementById(`qty-${id}`);
-  let qty = parseInt(el.textContent) || 0;
+  let qty = parseInt(el.textContent, 10) || 0;
   qty = Math.max(0, qty + delta);
   el.textContent = qty;
   calcTotal();
@@ -55,10 +54,10 @@ function updateQty(id, delta) {
 
 function generateOrder() {
   const lines = ['Pedido Rango in Natura:'];
-  items.forEach(it => {
-    const qty = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
+  items.forEach(item => {
+    const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
     if (qty > 0) {
-      lines.push(`• ${qty}x ${getItemName(it)}`);
+      lines.push(`• ${qty}x ${getItemName(item)}`);
     }
   });
   lines.push(`Total: ${totalEl.textContent}`);
@@ -68,39 +67,38 @@ function generateOrder() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  items.filter(it => it.stock > 0).forEach(it => {
+  items.filter(item => item.stock > 0).forEach(item => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <h2>${getItemName(it)}</h2>
-      <p>Preço: ${formatBRL(it.price)}</p>
-      <p>Em estoque: ${it.stock}</p>
+      <h2>${getItemName(item)}</h2>
+      <p>Preço: <span class="price-tag">${formatBRL(item.price)}</span></p>
+      <p>Em estoque: ${item.stock}</p>
       <div class="qty-control">
-        <button class="qty-btn minus" data-id="${it.id}">–</button>
-        <span id="qty-${it.id}" class="qty-display">0</span>
-        <button class="qty-btn plus"  data-id="${it.id}">+</button>
+        <button class="qty-btn minus" data-id="${item.id}">–</button>
+        <span id="qty-${item.id}" class="qty-display">0</span>
+        <button class="qty-btn plus"  data-id="${item.id}">+</button>
       </div>
     `;
     gridEl.appendChild(card);
 
-    card.querySelector('.qty-btn.minus').addEventListener('click', () => updateQty(it.id, -1));
-    card.querySelector('.qty-btn.plus').addEventListener('click', () => {
-      const current = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
-      if (current < it.stock) updateQty(it.id, +1);
+    const minusBtn = card.querySelector('.qty-btn.minus');
+    const plusBtn  = card.querySelector('.qty-btn.plus');
+
+    minusBtn.addEventListener('click', () => updateQty(item.id, -1));
+    plusBtn.addEventListener('click', () => {
+      const current = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
+      if (current < item.stock) updateQty(item.id, +1);
     });
   });
 }
 
 function fetchSheet() {
   fetch(SHEET_URL)
-    .then(r => r.text())
+    .then(res => res.text())
     .then(txt => {
-      const jsonText = txt.substring(
-        txt.indexOf('{'),
-        txt.lastIndexOf('}') + 1
-      );
-      const data = JSON.parse(jsonText);
-      return data.table.rows;
+      const jsonStr = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
+      return JSON.parse(jsonStr).table.rows;
     })
     .then(rows => {
       items = rows.map((r, i) => ({
@@ -108,9 +106,8 @@ function fetchSheet() {
         protein: r.c[0]?.v || '',
         side:    r.c[1]?.v || '',
         price:   parseFloat(r.c[2]?.v) || 0,
-        stock:   parseInt(r.c[3]?.v)   || 0
-      }))
-      .filter(it => it.stock > 0);
+        stock:   parseInt(r.c[3]?.v, 10) || 0
+      })).filter(it => it.stock > 0);
       renderItems();
     })
     .catch(err => console.error('Erro ao buscar Sheet:', err));
