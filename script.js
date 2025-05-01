@@ -1,6 +1,6 @@
 // script.js
 
-const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M'; 
+const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
@@ -54,7 +54,8 @@ function generateOrder() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  items.forEach(it => {
+  // só exibe itens com estoque positivo
+  items.filter(it => it.stock > 0).forEach(it => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -69,11 +70,8 @@ function renderItems() {
     `;
     gridEl.appendChild(card);
 
-    card.querySelector(`.qty-btn.minus`).addEventListener('click', () => {
-      updateQty(it.id, -1);
-    });
-    card.querySelector(`.qty-btn.plus`).addEventListener('click', () => {
-      // não deixa passar do estoque
+    card.querySelector('.qty-btn.minus').addEventListener('click', () => updateQty(it.id, -1));
+    card.querySelector('.qty-btn.plus').addEventListener('click', () => {
       const current = parseInt(document.getElementById(`qty-${it.id}`).textContent) || 0;
       if (current < it.stock) updateQty(it.id, +1);
     });
@@ -98,7 +96,9 @@ function fetchSheet() {
         side:    r.c[1]?.v || '',
         price:   parseFloat(r.c[2]?.v) || 0,
         stock:   parseInt(r.c[3]?.v)   || 0
-      }));
+      }))
+      // filtra fora os que estão zerados
+      .filter(it => it.stock > 0);
       renderItems();
     })
     .catch(err => console.error('Erro ao buscar Sheet:', err));
