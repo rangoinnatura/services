@@ -1,16 +1,19 @@
 /* style.css */
 
-/* === cores e reset continuam iguais === */
+/* === cores e reset atualizados === */
 :root {
-  --brand-orange: #ff7f11;
-  --brand-green:  #2f9e44;
+  --brand-orange: #F29200;
+  --brand-green:  #C6D300;
   --bg-offwhite:  #fdfcf7;
 }
 
+/* base */
 body {
   background: var(--bg-offwhite);
   font-family: 'Roboto', sans-serif;
   color: #333;
+  font-size: 16px;
+  line-height: 1.5;
   padding: 1rem;
   margin: 0;
 }
@@ -22,42 +25,44 @@ main.container {
 
 h1 {
   text-align: center;
-  margin-bottom: 1rem;
-  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
-/* mobile-first: 1 coluna só */
+/* grid */
 .grid {
   display: grid;
-  gap: 0.75rem;
+  gap: 1rem;
   grid-template-columns: 1fr;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .card {
   background: #fff;
-  border-radius: 6px;
-  padding: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
 }
 
 .card h2 {
-  font-size: 1rem;
+  font-size: 1.25rem;
   margin: 0 0 0.5rem;
+  font-weight: 600;
 }
 
 .card p {
-  margin: 0.3rem 0;
-  font-size: 0.9rem;
+  margin: 0.4rem 0;
+  font-size: 1rem;
 }
 
-/* === Botões de quantidade modernizados === */
+/* quantity buttons */
 .qty-control {
   display: flex;
   align-items: center;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .qty-btn {
@@ -66,92 +71,87 @@ h1 {
   align-items: center;
   width: 2.5rem;
   height: 2.5rem;
-  min-width: 44px;   /* alvo mínimo de toque */
-  min-height: 44px;
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: bold;
-  border: 2px solid var(--brand-orange);
-  border-radius: 50%;
-  background: #fff;
-  color: var(--brand-orange);
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1.25rem;
+  color: #555;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, transform 0.1s;
-  outline: none;
 }
 
-/* botões coloridos de acordo com a ação */
-.qty-btn.minus { 
-  border-color: var(--brand-orange);
-  color: var(--brand-orange);
-}
-.qty-btn.plus { 
-  border-color: var(--brand-green);
-  color: var(--brand-green);
+.qty-btn:hover {
+  transform: scale(1.05);
 }
 
-/* estado de hover/focus */
-.qty-btn:hover,
-.qty-btn:focus {
-  transform: scale(1.1);
-}
 .qty-btn.minus:hover {
   background: var(--brand-orange);
   color: #fff;
+  border-color: var(--brand-orange);
 }
+
 .qty-btn.plus:hover {
   background: var(--brand-green);
   color: #fff;
+  border-color: var(--brand-green);
 }
 
-/* espaçamento do display entre os botões */
 .qty-display {
-  margin: 0 0.5rem;
-  width: 1.5rem;
+  margin: 0 0.75rem;
+  min-width: 2rem;
   text-align: center;
   font-size: 1.1rem;
+  font-weight: 500;
 }
 
-/* summary fica column no mobile */
+/* summary */
 .summary {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .summary p {
-  font-size: 1.1rem;
-  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  margin: 0 0 0.75rem;
+  font-weight: 600;
 }
 
-/* botão full-width no mobile */
+/* primary buttons (generate & copy) */
 .button-primary {
+  display: inline-block;
   width: 100%;
   padding: 0.75rem;
   background: var(--brand-orange);
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 1rem;
-  transition: background 0.2s;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background 0.2s, transform 0.1s;
+  text-align: center;
 }
 
 .button-primary:hover {
   background: var(--brand-green);
+  transform: translateY(-1px);
 }
 
-/* área de texto */
+/* textarea */
 #order-text {
   width: 100%;
   font-family: monospace;
+  font-size: 1rem;
   resize: vertical;
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 0.75rem;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  margin-bottom: 0.75rem;
 }
 
-/* === no tablet / desktop, várias colunas e summary em row === */
+/* responsividade */
 @media (min-width: 600px) {
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
