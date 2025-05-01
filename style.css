@@ -103,8 +103,14 @@ h1 {
   transition: border-color 0.2s;
 }
 
-.qty-btn:hover {
+.qty-btn:hover:not(:disabled) {
   border-color: #888;
+}
+
+/* estilo de botão desabilitado */
+.qty-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .qty-display {
@@ -116,7 +122,7 @@ h1 {
   display: inline-block;
 }
 
-/* === Animação de bump === */
+/* === Animação de bump (já inserida) === */
 @keyframes bump {
   0%   { transform: scale(1); }
   50%  { transform: scale(1.3); }
@@ -154,12 +160,18 @@ h1 {
   font-size: 1rem;
   font-weight: 600;
   box-shadow: 0 3px 6px rgba(242,146,0,0.3);
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, box-shadow 0.2s;
   text-align: center;
 }
 
 .button-primary:hover {
   opacity: 0.9;
+}
+
+/* foco customizado */
+.button-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(242,146,0,0.5);
 }
 
 /* Botão secundário (Copiar) */
@@ -177,11 +189,17 @@ h1 {
   font-weight: 600;
   text-align: center;
   user-select: none;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 .button-secondary:hover {
   background-color: rgba(242,146,0,0.1);
+}
+
+/* foco customizado */
+.button-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(242,146,0,0.5);
 }
 
 /* Estado de cópia bem destacado */
