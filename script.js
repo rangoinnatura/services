@@ -1,7 +1,7 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
+const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 const gridEl   = document.getElementById('grid');
@@ -11,18 +11,24 @@ const outputEl = document.getElementById('order-text');
 
 // cria botão de copiar abaixo do textarea
 const copyBtn = document.createElement('button');
-copyBtn.textContent = 'Copiar pedido';
-copyBtn.className   = 'button-secondary';
-copyBtn.style.width = '100%';
+copyBtn.textContent    = 'Copiar pedido';
+copyBtn.className      = 'button-secondary';
+copyBtn.style.width    = '100%';
 copyBtn.style.marginTop = '0.5rem';
+
 copyBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
       copyBtn.textContent = 'Copiado!';
-      setTimeout(() => copyBtn.textContent = 'Copiar pedido', 2000);
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copiar pedido';
+        copyBtn.classList.remove('copied');
+      }, 2000);
     })
     .catch(err => console.error('Erro ao copiar:', err));
 });
+
 outputEl.parentNode.insertBefore(copyBtn, outputEl.nextSibling);
 
 function formatBRL(value) {
@@ -30,9 +36,8 @@ function formatBRL(value) {
 }
 
 function getItemName(item) {
-  return item.protein && item.side
-    ? `${item.protein} + ${item.side}`
-    : (item.protein || item.side || '');
+  if (item.protein && item.side) return `${item.protein} + ${item.side}`;
+  return item.protein || item.side || '';
 }
 
 function calcTotal() {
@@ -56,9 +61,7 @@ function generateOrder() {
   const lines = ['Pedido Rango in Natura:'];
   items.forEach(item => {
     const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
-    if (qty > 0) {
-      lines.push(`• ${qty}x ${getItemName(item)}`);
-    }
+    if (qty > 0) lines.push(`• ${qty}x ${getItemName(item)}`);
   });
   lines.push(`Total: ${totalEl.textContent}`);
   outputEl.value = lines.join('\n');
@@ -77,19 +80,21 @@ function renderItems() {
       <div class="qty-control">
         <button class="qty-btn minus" data-id="${item.id}">–</button>
         <span id="qty-${item.id}" class="qty-display">0</span>
-        <button class="qty-btn plus"  data-id="${item.id}">+</button>
+        <button class="qty-btn plus" data-id="${item.id}">+</button>
       </div>
     `;
     gridEl.appendChild(card);
 
-    const minusBtn = card.querySelector('.qty-btn.minus');
-    const plusBtn  = card.querySelector('.qty-btn.plus');
-
-    minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn.addEventListener('click', () => {
-      const current = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
-      if (current < item.stock) updateQty(item.id, +1);
-    });
+    // eventos de click
+    card.querySelector('.qty-btn.minus')
+        .addEventListener('click', () => updateQty(item.id, -1));
+    card.querySelector('.qty-btn.plus')
+        .addEventListener('click', () => {
+          const current = parseInt(
+            document.getElementById(`qty-${item.id}`).textContent, 10
+          ) || 0;
+          if (current < item.stock) updateQty(item.id, +1);
+        });
   });
 }
 
