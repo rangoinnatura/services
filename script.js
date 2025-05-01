@@ -12,7 +12,7 @@ const outputEl = document.getElementById('order-text');
 // cria botão de copiar abaixo do textarea
 const copyBtn = document.createElement('button');
 copyBtn.textContent = 'Copiar pedido';
-copyBtn.className = 'button-primary';
+copyBtn.className = 'button-secondary';
 copyBtn.style.marginTop = '0.5rem';
 copyBtn.style.width = '100%';
 copyBtn.addEventListener('click', () => {
@@ -75,10 +75,10 @@ function renderItems() {
       <h2>${getItemName(it)}</h2>
       <p>Preço: ${formatBRL(it.price)}</p>
       <p>Em estoque: ${it.stock}</p>
-      <div class=\"qty-control\">
-        <button class=\"qty-btn minus\" data-id=\"${it.id}\">–</button>
-        <span id=\"qty-${it.id}\" class=\"qty-display\">0</span>
-        <button class=\"qty-btn plus\"  data-id=\"${it.id}\">+</button>
+      <div class="qty-control">
+        <button class="qty-btn minus" data-id="${it.id}">–</button>
+        <span id="qty-${it.id}" class="qty-display">0</span>
+        <button class="qty-btn plus"  data-id="${it.id}">+</button>
       </div>
     `;
     gridEl.appendChild(card);
