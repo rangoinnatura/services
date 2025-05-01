@@ -9,6 +9,22 @@ const totalEl  = document.getElementById('total');
 const genBtn   = document.getElementById('generate');
 const outputEl = document.getElementById('order-text');
 
+// cria botão de copiar abaixo do textarea
+const copyBtn = document.createElement('button');
+copyBtn.textContent = 'Copiar pedido';
+copyBtn.className = 'button-primary';
+copyBtn.style.marginTop = '0.5rem';
+copyBtn.style.width = '100%';
+copyBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(outputEl.value)
+    .then(() => {
+      copyBtn.textContent = 'Copiado!';
+      setTimeout(() => (copyBtn.textContent = 'Copiar pedido'), 2000);
+    })
+    .catch(err => console.error('Erro ao copiar:', err));
+});
+outputEl.parentNode.insertBefore(copyBtn, outputEl.nextSibling);
+
 function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
@@ -20,7 +36,6 @@ function getItemName(item) {
   return item.protein || item.side || '';
 }
 
-// atualiza total lendo do display de cada card
 function calcTotal() {
   let sum = 0;
   items.forEach(it => {
@@ -30,7 +45,6 @@ function calcTotal() {
   totalEl.textContent = formatBRL(sum);
 }
 
-// +1 / -1 no display
 function updateQty(id, delta) {
   const el = document.getElementById(`qty-${id}`);
   let qty = parseInt(el.textContent) || 0;
@@ -54,7 +68,6 @@ function generateOrder() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  // só exibe itens com estoque positivo
   items.filter(it => it.stock > 0).forEach(it => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -62,10 +75,10 @@ function renderItems() {
       <h2>${getItemName(it)}</h2>
       <p>Preço: ${formatBRL(it.price)}</p>
       <p>Em estoque: ${it.stock}</p>
-      <div class="qty-control">
-        <button class="qty-btn minus" data-id="${it.id}">–</button>
-        <span id="qty-${it.id}" class="qty-display">0</span>
-        <button class="qty-btn plus"  data-id="${it.id}">+</button>
+      <div class=\"qty-control\">
+        <button class=\"qty-btn minus\" data-id=\"${it.id}\">–</button>
+        <span id=\"qty-${it.id}\" class=\"qty-display\">0</span>
+        <button class=\"qty-btn plus\"  data-id=\"${it.id}\">+</button>
       </div>
     `;
     gridEl.appendChild(card);
@@ -97,7 +110,6 @@ function fetchSheet() {
         price:   parseFloat(r.c[2]?.v) || 0,
         stock:   parseInt(r.c[3]?.v)   || 0
       }))
-      // filtra fora os que estão zerados
       .filter(it => it.stock > 0);
       renderItems();
     })
