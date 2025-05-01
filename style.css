@@ -1,13 +1,16 @@
+/* style.css */
+
 /* === Import de fonte === */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* === Variáveis de cor e reset === */
+/* === Variáveis de cor === */
 :root {
   --brand-orange: #F29200;
   --brand-green:  #C6D300;
   --bg-offwhite:  #fdfcf7;
 }
 
+/* === Reset básico === */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -110,6 +113,18 @@ h1 {
   text-align: center;
   font-weight: 500;
   font-size: 1.1rem;
+  display: inline-block;
+}
+
+/* === Animação de bump === */
+@keyframes bump {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.qty-display.bump {
+  animation: bump 300ms ease-out;
 }
 
 /* === Sumário e botão Gerar Pedido === */
@@ -162,16 +177,11 @@ h1 {
   font-weight: 600;
   text-align: center;
   user-select: none;
-  outline: none;
   transition: background-color 0.2s, color 0.2s;
 }
 
 .button-secondary:hover {
   background-color: rgba(242,146,0,0.1);
-}
-
-.button-secondary:focus {
-  outline: none;
 }
 
 /* Estado de cópia bem destacado */
@@ -191,22 +201,4 @@ h1 {
   font-family: monospace;
   font-size: 1rem;
   resize: vertical;
-  margin-bottom: 0.75rem;
-}
-
-/* === Responsividade === */
-@media (min-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
-  }
-  .summary {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .button-primary,
-  .button-secondary {
-    width: auto;
-    margin-top: 0;
-  }
-}
+  margin-bottom: 0
