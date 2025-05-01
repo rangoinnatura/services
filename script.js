@@ -1,7 +1,7 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 const gridEl   = document.getElementById('grid');
@@ -67,7 +67,9 @@ function generateOrder() {
   const lines = ['Pedido Rango in Natura:'];
   items.forEach(item => {
     const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
-    if (qty > 0) lines.push(`• ${qty}x ${getItemName(item)}`);
+    if (qty > 0) {
+      lines.push(`• ${qty}x ${getItemName(item)}`);
+    }
   });
   lines.push(`Total: ${totalEl.textContent}`);
   outputEl.value = lines.join('\n');
@@ -122,7 +124,7 @@ function fetchSheet() {
       renderItems();
     })
     .catch(err => {
-      console.error('Erro ao buscar Sheet:', err);
+      console.error('Erro ao buscar dados:', err);
       gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
     });
 }
