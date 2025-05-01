@@ -11,9 +11,9 @@ const outputEl = document.getElementById('order-text');
 
 // cria botão de copiar abaixo do textarea
 const copyBtn = document.createElement('button');
-copyBtn.textContent    = 'Copiar pedido';
-copyBtn.className      = 'button-secondary';
-copyBtn.style.width    = '100%';
+copyBtn.textContent     = 'Copiar pedido';
+copyBtn.className       = 'button-secondary';
+copyBtn.style.width     = '100%';
 copyBtn.style.marginTop = '0.5rem';
 
 copyBtn.addEventListener('click', () => {
@@ -55,6 +55,12 @@ function updateQty(id, delta) {
   qty = Math.max(0, qty + delta);
   el.textContent = qty;
   calcTotal();
+
+  // animação bump
+  el.classList.add('bump');
+  el.addEventListener('animationend', () => {
+    el.classList.remove('bump');
+  }, { once: true });
 }
 
 function generateOrder() {
@@ -85,9 +91,9 @@ function renderItems() {
     `;
     gridEl.appendChild(card);
 
-    // eventos de click
     card.querySelector('.qty-btn.minus')
         .addEventListener('click', () => updateQty(item.id, -1));
+
     card.querySelector('.qty-btn.plus')
         .addEventListener('click', () => {
           const current = parseInt(
@@ -115,7 +121,10 @@ function fetchSheet() {
       })).filter(it => it.stock > 0);
       renderItems();
     })
-    .catch(err => console.error('Erro ao buscar Sheet:', err));
+    .catch(err => {
+      console.error('Erro ao buscar Sheet:', err);
+      gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
+    });
 }
 
 genBtn.addEventListener('click', generateOrder);
