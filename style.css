@@ -8,13 +8,13 @@
   --bg-offwhite:  #fdfcf7;
 }
 
-/* === Base === */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* === Base === */
 body {
   background: var(--bg-offwhite);
   font-family: 'Inter', sans-serif;
@@ -57,13 +57,25 @@ h1 {
 
 .card h2 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   margin-bottom: 0.75rem;
 }
 
 .card p {
   font-size: 1rem;
   margin: 0.4rem 0;
+}
+
+/* === Badge de preço === */
+.price-tag {
+  background-color: var(--brand-green);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-left: 0.25rem;
 }
 
 /* === Controle de quantidade === */
@@ -114,7 +126,9 @@ h1 {
 }
 
 .button-primary {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 10px 20px;
   background-color: var(--brand-orange);
@@ -134,7 +148,9 @@ h1 {
 
 /* === Botão Copiar Pedido === */
 .button-secondary {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 10px 20px;
   background: transparent;
