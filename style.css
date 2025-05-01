@@ -201,4 +201,22 @@ h1 {
   font-family: monospace;
   font-size: 1rem;
   resize: vertical;
-  margin-bottom: 0
+  margin-bottom: 0.75rem;
+}
+
+/* === Responsividade === */
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  }
+  .summary {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .button-primary,
+  .button-secondary {
+    width: auto;
+    margin-top: 0;
+  }
+}
