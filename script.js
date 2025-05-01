@@ -1,7 +1,7 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
+const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 const gridEl   = document.getElementById('grid');
@@ -49,6 +49,17 @@ function calcTotal() {
   totalEl.textContent = formatBRL(sum);
 }
 
+function updateButtonState(id) {
+  const minusBtn = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
+  const plusBtn  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
+  const qtyEl    = document.getElementById(`qty-${id}`);
+  const qty      = parseInt(qtyEl.textContent, 10) || 0;
+  const item     = items.find(i => i.id === id);
+
+  minusBtn.disabled = qty === 0;
+  plusBtn.disabled  = qty >= item.stock;
+}
+
 function updateQty(id, delta) {
   const el = document.getElementById(`qty-${id}`);
   let qty = parseInt(el.textContent, 10) || 0;
@@ -61,6 +72,9 @@ function updateQty(id, delta) {
   el.addEventListener('animationend', () => {
     el.classList.remove('bump');
   }, { once: true });
+
+  // atualiza estado dos botões
+  updateButtonState(id);
 }
 
 function generateOrder() {
@@ -93,16 +107,14 @@ function renderItems() {
     `;
     gridEl.appendChild(card);
 
-    card.querySelector('.qty-btn.minus')
-        .addEventListener('click', () => updateQty(item.id, -1));
+    const minusBtn = card.querySelector('.qty-btn.minus');
+    const plusBtn  = card.querySelector('.qty-btn.plus');
 
-    card.querySelector('.qty-btn.plus')
-        .addEventListener('click', () => {
-          const current = parseInt(
-            document.getElementById(`qty-${item.id}`).textContent, 10
-          ) || 0;
-          if (current < item.stock) updateQty(item.id, +1);
-        });
+    minusBtn.addEventListener('click', () => updateQty(item.id, -1));
+    plusBtn.addEventListener('click', () => updateQty(item.id, +1));
+
+    // estado inicial dos botões
+    updateButtonState(item.id);
   });
 }
 
