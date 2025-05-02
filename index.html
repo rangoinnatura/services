@@ -12,6 +12,21 @@
 <body>
   <main class="container">
     <h1>Pronta Entrega Rango in Natura</h1>
+
+    <!-- template para os cards -->
+    <template id="item-template">
+      <div class="card">
+        <h2 class="item-name"></h2>
+        <p>Preço: <span class="price-tag"></span></p>
+        <p>Em estoque: <span class="stock-count"></span></p>
+        <div class="qty-control">
+          <button class="qty-btn minus" data-id="">–</button>
+          <span class="qty-display" id="">0</span>
+          <button class="qty-btn plus" data-id="">+</button>
+        </div>
+      </div>
+    </template>
+
     <div id="grid" class="grid"></div>
     <div id="summary" class="summary">
       <p>Total: <strong id="total">R$ 0,00</strong></p>
