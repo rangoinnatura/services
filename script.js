@@ -81,14 +81,16 @@ function generateOrder() {
 }
 
 function renderCategories() {
-  // pega categorias únicas
+  // pega categorias únicas vindas da planilha
   const available = new Set(items.map(i => i.category));
-  // ordem fixa
-  const order = ['Todos','Refeição','Creme','Lanche','Sobremesa'];
+
+  // ordem fixa, usando os nomes que realmente vêm no seu sheet
+  const order = ['Todos', 'Refeições', 'Cremes', 'Lanches', 'Sobremesas'];
+
+  // filtra só as que existem
   const cats = order.filter(cat => cat === 'Todos' || available.has(cat));
 
-  console.log('Categorias disponíveis:', [...available]); // só pra debug
-
+  // renderiza as abas
   categoriesEl.innerHTML = '';
   cats.forEach(cat => {
     const btn = document.createElement('button');
@@ -102,6 +104,7 @@ function renderCategories() {
     categoriesEl.appendChild(btn);
   });
 }
+
 
 function renderItems() {
   gridEl.innerHTML = '';
