@@ -60,12 +60,10 @@ function updateButtonState(id) {
 function updateQty(id, delta) {
   const item = items[id];
   item.qty = Math.max(0, item.qty + delta);
-  // atualiza o DOM
   const qtyEl = document.getElementById(`qty-${id}`);
   qtyEl.textContent = item.qty;
   calcTotal();
 
-  // animação bump
   qtyEl.classList.add('bump');
   qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
 
@@ -83,11 +81,13 @@ function generateOrder() {
 }
 
 function renderCategories() {
+  // pega categorias únicas
   const available = new Set(items.map(i => i.category));
-  // define a ordem desejada aqui:
+  // ordem fixa
   const order = ['Todos','Refeição','Creme','Lanche','Sobremesa'];
-  // filtra só o que existe
   const cats = order.filter(cat => cat === 'Todos' || available.has(cat));
+
+  console.log('Categorias disponíveis:', [...available]); // só pra debug
 
   categoriesEl.innerHTML = '';
   cats.forEach(cat => {
@@ -108,6 +108,7 @@ function renderItems() {
   const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
   toShow.forEach(item => {
     const clone = template.content.cloneNode(true);
+
     clone.querySelector('.item-name').textContent   = getItemName(item);
     clone.querySelector('.price-tag').textContent   = formatBRL(item.price);
     clone.querySelector('.stock-count').textContent = item.stock;
@@ -119,7 +120,6 @@ function renderItems() {
     minusBtn.dataset.id = item.id;
     plusBtn.dataset.id  = item.id;
     qtyEl.id            = `qty-${item.id}`;
-    // **preenche com o qty atual**
     qtyEl.textContent   = item.qty;
 
     minusBtn.addEventListener('click', () => updateQty(item.id, -1));
@@ -143,8 +143,8 @@ async function fetchSheet() {
       side:     r.c[1]?.v || '',
       price:    parseFloat(r.c[2]?.v) || 0,
       stock:    parseInt(r.c[3]?.v,10) || 0,
-      category: r.c[4]?.v || 'Refeição',
-      qty:      0         // **inicializa qty**
+      category: r.c[4]?.v || 'Refeição', // fallback garantido
+      qty:      0
     })).filter(i => i.stock > 0);
 
     renderCategories();
