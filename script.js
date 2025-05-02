@@ -90,8 +90,8 @@ function renderItems() {
     const clone = template.content.cloneNode(true);
 
     // preencher clone
-    clone.querySelector('.item-name').textContent  = getItemName(item);
-    clone.querySelector('.price-tag').textContent  = formatBRL(item.price);
+    clone.querySelector('.item-name').textContent   = getItemName(item);
+    clone.querySelector('.price-tag').textContent   = formatBRL(item.price);
     clone.querySelector('.stock-count').textContent = item.stock;
 
     const minusBtn = clone.querySelector('.qty-btn.minus');
@@ -104,22 +104,21 @@ function renderItems() {
 
     // eventos
     minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn .addEventListener('click', () => updateQty(item.id, +1));
+    plusBtn.addEventListener('click',  () => updateQty(item.id, +1));
 
-    // estado inicial
-    updateButtonState(item.id);
-
+    // primeiro adiciona ao DOM, só depois ajusta o estado inicial
     gridEl.appendChild(clone);
+    updateButtonState(item.id);
   });
 }
 
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
-    const res    = await fetch(SHEET_URL);
-    const txt    = await res.text();
-    const json   = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
-    const rows   = JSON.parse(json).table.rows;
+    const res  = await fetch(SHEET_URL);
+    const txt  = await res.text();
+    const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
+    const rows = JSON.parse(json).table.rows;
     items = rows.map((r,i) => ({
       id:      i,
       protein: r.c[0]?.v || '',
