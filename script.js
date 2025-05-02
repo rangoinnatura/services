@@ -1,7 +1,8 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
+// Atenção aqui: adicionamos &t=${Date.now()} para cada chamada, forçando fresh
+const BASE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 let activeCategory = 'Todos';
@@ -81,21 +82,15 @@ function generateOrder() {
 }
 
 function renderCategories() {
-  // pega categorias únicas vindas da planilha
   const available = new Set(items.map(i => i.category));
+  const order     = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
+  const cats      = order.filter(cat => cat === 'Todos' || available.has(cat));
 
-  // ordem fixa, usando os nomes que realmente vêm no seu sheet
-  const order = ['Todos', 'Refeições', 'Cremes', 'Lanches', 'Sobremesas'];
-
-  // filtra só as que existem
-  const cats = order.filter(cat => cat === 'Todos' || available.has(cat));
-
-  // renderiza as abas
   categoriesEl.innerHTML = '';
   cats.forEach(cat => {
     const btn = document.createElement('button');
     btn.textContent = cat;
-    btn.className = 'category-btn' + (cat === activeCategory ? ' active' : '');
+    btn.className   = 'category-btn' + (cat === activeCategory ? ' active' : '');
     btn.addEventListener('click', () => {
       activeCategory = cat;
       renderCategories();
@@ -104,7 +99,6 @@ function renderCategories() {
     categoriesEl.appendChild(btn);
   });
 }
-
 
 function renderItems() {
   gridEl.innerHTML = '';
@@ -134,9 +128,11 @@ function renderItems() {
 }
 
 async function fetchSheet() {
+  // adiciona um timestamp único pra quebrar cache
+  const url = `${BASE_SHEET_URL}&t=${Date.now()}`;
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
-    const res  = await fetch(SHEET_URL);
+    const res  = await fetch(url);
     const txt  = await res.text();
     const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
     const rows = JSON.parse(json).table.rows;
@@ -146,7 +142,7 @@ async function fetchSheet() {
       side:     r.c[1]?.v || '',
       price:    parseFloat(r.c[2]?.v) || 0,
       stock:    parseInt(r.c[3]?.v,10) || 0,
-      category: r.c[4]?.v || 'Refeição', // fallback garantido
+      category: r.c[4]?.v || 'Refeição',
       qty:      0
     })).filter(i => i.stock > 0);
 
