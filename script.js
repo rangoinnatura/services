@@ -38,49 +38,44 @@ function formatBRL(v) {
 }
 
 function getItemName(item) {
-  if (item.protein && item.side) return `${item.protein} + ${item.side}`;
-  return item.protein || item.side || '';
+  return item.protein && item.side
+    ? `${item.protein} + ${item.side}`
+    : item.protein || item.side || '';
 }
 
 function calcTotal() {
-  let sum = 0;
-  items.forEach(item => {
-    const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
-    sum += qty * item.price;
-  });
+  const sum = items.reduce((acc, i) => acc + (i.qty * i.price), 0);
   totalEl.textContent = formatBRL(sum);
 }
 
 function updateButtonState(id) {
   const minus = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
   const plus  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
-  const qtyEl = document.getElementById(`qty-${id}`);
-  const qty   = parseInt(qtyEl.textContent, 10) || 0;
-  const item  = items.find(i => i.id === id);
+  const item  = items[id];
 
-  minus.disabled = qty === 0;
-  plus.disabled  = qty >= item.stock;
+  minus.disabled = item.qty === 0;
+  plus.disabled  = item.qty >= item.stock;
 }
 
 function updateQty(id, delta) {
-  const el = document.getElementById(`qty-${id}`);
-  let qty = parseInt(el.textContent, 10) || 0;
-  qty = Math.max(0, qty + delta);
-  el.textContent = qty;
+  const item = items[id];
+  item.qty = Math.max(0, item.qty + delta);
+  // atualiza o DOM
+  const qtyEl = document.getElementById(`qty-${id}`);
+  qtyEl.textContent = item.qty;
   calcTotal();
 
   // animação bump
-  el.classList.add('bump');
-  el.addEventListener('animationend', () => el.classList.remove('bump'), { once: true });
+  qtyEl.classList.add('bump');
+  qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
 
   updateButtonState(id);
 }
 
 function generateOrder() {
   const lines = ['Pedido Rango in Natura:'];
-  items.forEach(item => {
-    const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
-    if (qty > 0) lines.push(`• ${qty}x ${getItemName(item)}`);
+  items.forEach(i => {
+    if (i.qty > 0) lines.push(`• ${i.qty}x ${getItemName(i)}`);
   });
   lines.push(`Total: ${totalEl.textContent}`);
   outputEl.value = lines.join('\n');
@@ -88,14 +83,13 @@ function generateOrder() {
 }
 
 function renderCategories() {
-  // pega categorias únicas
   const cats = Array.from(new Set(items.map(i => i.category)));
-  cats.unshift('Todos'); // primeira aba
+  cats.unshift('Todos');
   categoriesEl.innerHTML = '';
   cats.forEach(cat => {
     const btn = document.createElement('button');
     btn.textContent = cat;
-    btn.className   = 'category-btn' + (cat === activeCategory ? ' active' : '');
+    btn.className = 'category-btn' + (cat === activeCategory ? ' active' : '');
     btn.addEventListener('click', () => {
       activeCategory = cat;
       renderCategories();
@@ -107,11 +101,9 @@ function renderCategories() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  // filtra por categoria ativa
   const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
   toShow.forEach(item => {
     const clone = template.content.cloneNode(true);
-
     clone.querySelector('.item-name').textContent   = getItemName(item);
     clone.querySelector('.price-tag').textContent   = formatBRL(item.price);
     clone.querySelector('.stock-count').textContent = item.stock;
@@ -123,9 +115,11 @@ function renderItems() {
     minusBtn.dataset.id = item.id;
     plusBtn.dataset.id  = item.id;
     qtyEl.id            = `qty-${item.id}`;
+    // **preenche com o qty atual**
+    qtyEl.textContent   = item.qty;
 
     minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn .addEventListener('click', () => updateQty(item.id, +1));
+    plusBtn.addEventListener('click',  () => updateQty(item.id, +1));
 
     gridEl.appendChild(clone);
     updateButtonState(item.id);
@@ -145,11 +139,13 @@ async function fetchSheet() {
       side:     r.c[1]?.v || '',
       price:    parseFloat(r.c[2]?.v) || 0,
       stock:    parseInt(r.c[3]?.v,10) || 0,
-      category: r.c[4]?.v || 'Refeição'
+      category: r.c[4]?.v || 'Refeição',
+      qty:      0         // **inicializa qty**
     })).filter(i => i.stock > 0);
 
     renderCategories();
     renderItems();
+    calcTotal();
   } catch(err) {
     console.error('Erro ao buscar dados:', err);
     gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
