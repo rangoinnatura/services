@@ -83,8 +83,12 @@ function generateOrder() {
 }
 
 function renderCategories() {
-  const cats = Array.from(new Set(items.map(i => i.category)));
-  cats.unshift('Todos');
+  const available = new Set(items.map(i => i.category));
+  // define a ordem desejada aqui:
+  const order = ['Todos','Refeição','Creme','Lanche','Sobremesa'];
+  // filtra só o que existe
+  const cats = order.filter(cat => cat === 'Todos' || available.has(cat));
+
   categoriesEl.innerHTML = '';
   cats.forEach(cat => {
     const btn = document.createElement('button');
