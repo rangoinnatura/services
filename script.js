@@ -5,7 +5,7 @@ const BASE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}
 
 let items = [];
 let activeCategory = 'Todos';
-let orderMode = 'Entrega'; // estado atual do modo
+let orderMode = 'Delivery';
 
 const gridEl       = document.getElementById('grid');
 const totalEl      = document.getElementById('total');
@@ -16,21 +16,16 @@ const template     = document.getElementById('item-template');
 const modeEntrega  = document.getElementById('mode-entrega');
 const modeRetirada = document.getElementById('mode-retirada');
 
-// inicializa botões de modo
+// Modo de pedido
 function updateModeButtons() {
-  if (orderMode === 'Entrega') {
-    modeEntrega.classList.add('active');
-    modeRetirada.classList.remove('active');
-  } else {
-    modeEntrega.classList.remove('active');
-    modeRetirada.classList.add('active');
-  }
+  modeEntrega.classList.toggle('active', orderMode === 'Delivery');
+  modeRetirada.classList.toggle('active', orderMode === 'Retirada');
 }
-modeEntrega.addEventListener('click', () => { orderMode = 'Entrega'; updateModeButtons(); });
-modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
+modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateModeButtons(); });
+modeRetirada.addEventListener('click',  () => { orderMode = 'Retirada';  updateModeButtons(); });
 updateModeButtons();
 
-// cria botão “Copiar pedido”
+// Botão “Copiar pedido”
 const copyBtn = document.createElement('button');
 copyBtn.textContent     = 'Copiar pedido';
 copyBtn.className       = 'button-secondary';
@@ -53,15 +48,18 @@ outputEl.parentNode.insertBefore(copyBtn, outputEl.nextSibling);
 function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
 function getItemName(item) {
   return item.protein && item.side
     ? `${item.protein} + ${item.side}`
     : item.protein || item.side || '';
 }
+
 function calcTotal() {
-  const sum = items.reduce((acc, i) => acc + (i.qty * i.price), 0);
+  const sum = items.reduce((acc, i) => acc + i.qty * i.price, 0);
   totalEl.textContent = formatBRL(sum);
 }
+
 function updateButtonState(id) {
   const minus = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
   const plus  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
@@ -69,6 +67,7 @@ function updateButtonState(id) {
   minus.disabled = item.qty === 0;
   plus.disabled  = item.qty >= item.stock;
 }
+
 function updateQty(id, delta) {
   const item = items[id];
   item.qty = Math.max(0, item.qty + delta);
@@ -80,31 +79,29 @@ function updateQty(id, delta) {
   updateButtonState(id);
 }
 
-// Gera o texto final incluindo modo, data/hora e mensagem estilizada
 function generateOrder() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', {
-    day:   '2-digit',
-    month: 'long',
-    year:  'numeric'
+    day: '2-digit', month: 'long', year: 'numeric'
   });
   const timeStr = now.toLocaleTimeString('pt-BR', {
-    hour:   '2-digit',
-    minute: '2-digit'
+    hour: '2-digit', minute: '2-digit'
   });
 
   const lines = [];
   lines.push('🛒 *Pedido Pronta Entrega Rango in Natura*');
   lines.push(`📅 ${dateStr} às ${timeStr}`);
-  lines.push(`📍 ${orderMode === 'Entrega' ? '🚚 Entrega' : '🏬 Retirada'}`);
   lines.push('');
   items.forEach(item => {
-    if (item.qty > 0) {
-      lines.push(`• ${item.qty}x ${getItemName(item)}`);
-    }
+    if (item.qty > 0) lines.push(`• ${item.qty}x ${getItemName(item)}`);
   });
   lines.push('');
   lines.push(`💰 *Total:* ${totalEl.textContent}`);
+  if (orderMode === 'Delivery') {
+    lines.push(`🛵 *Modo de entrega:* Delivery (valor à combinar)`);
+  } else {
+    lines.push(`🏬 *Modo de entrega:* Retirada`);
+  }
   lines.push('');
   lines.push('Comer bem nunca foi tão fácil! 💚');
 
@@ -132,23 +129,25 @@ function renderCategories() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  const toShow = items.filter(
-    i => activeCategory === 'Todos' || i.category === activeCategory
-  );
+  const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
   toShow.forEach(item => {
     const clone = template.content.cloneNode(true);
     clone.querySelector('.item-name').textContent   = getItemName(item);
     clone.querySelector('.price-tag').textContent   = formatBRL(item.price);
     clone.querySelector('.stock-count').textContent = item.stock;
+
     const minusBtn = clone.querySelector('.qty-btn.minus');
     const plusBtn  = clone.querySelector('.qty-btn.plus');
     const qtyEl    = clone.querySelector('.qty-display');
+
     minusBtn.dataset.id = item.id;
     plusBtn.dataset.id  = item.id;
     qtyEl.id            = `qty-${item.id}`;
     qtyEl.textContent   = item.qty;
+
     minusBtn.addEventListener('click', () => updateQty(item.id, -1));
     plusBtn.addEventListener('click',  () => updateQty(item.id, +1));
+
     gridEl.appendChild(clone);
     updateButtonState(item.id);
   });
@@ -171,6 +170,7 @@ async function fetchSheet() {
       category: r.c[4]?.v || 'Refeição',
       qty:      0
     })).filter(i => i.stock > 0);
+
     renderCategories();
     renderItems();
     calcTotal();
