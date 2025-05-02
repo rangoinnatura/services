@@ -8,8 +8,9 @@ const gridEl   = document.getElementById('grid');
 const totalEl  = document.getElementById('total');
 const genBtn   = document.getElementById('generate');
 const outputEl = document.getElementById('order-text');
+const template  = document.getElementById('item-template');
 
-// botão “Copiar pedido”
+// cria botão de copiar
 const copyBtn = document.createElement('button');
 copyBtn.textContent     = 'Copiar pedido';
 copyBtn.className       = 'button-secondary';
@@ -65,6 +66,7 @@ function updateQty(id, delta) {
   el.textContent = qty;
   calcTotal();
 
+  // bump
   el.classList.add('bump');
   el.addEventListener('animationend', () => el.classList.remove('bump'), { once: true });
 
@@ -84,46 +86,49 @@ function generateOrder() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  items.filter(i => i.stock > 0).forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <h2>${getItemName(item)}</h2>
-      <p>Preço: <span class="price-tag">${formatBRL(item.price)}</span></p>
-      <p>Em estoque: ${item.stock}</p>
-      <div class="qty-control">
-        <button class="qty-btn minus" data-id="${item.id}">–</button>
-        <span id="qty-${item.id}" class="qty-display">0</span>
-        <button class="qty-btn plus" data-id="${item.id}">+</button>
-      </div>
-    `;
-    gridEl.appendChild(card);
+  items.forEach(item => {
+    const clone = template.content.cloneNode(true);
 
-    const minus = card.querySelector('.qty-btn.minus');
-    const plus  = card.querySelector('.qty-btn.plus');
-    minus.addEventListener('click', () => updateQty(item.id, -1));
-    plus.addEventListener('click',  () => updateQty(item.id, +1));
+    // preencher clone
+    clone.querySelector('.item-name').textContent  = getItemName(item);
+    clone.querySelector('.price-tag').textContent  = formatBRL(item.price);
+    clone.querySelector('.stock-count').textContent = item.stock;
+
+    const minusBtn = clone.querySelector('.qty-btn.minus');
+    const plusBtn  = clone.querySelector('.qty-btn.plus');
+    const qtyEl    = clone.querySelector('.qty-display');
+
+    minusBtn.dataset.id = item.id;
+    plusBtn.dataset.id  = item.id;
+    qtyEl.id            = `qty-${item.id}`;
+
+    // eventos
+    minusBtn.addEventListener('click', () => updateQty(item.id, -1));
+    plusBtn .addEventListener('click', () => updateQty(item.id, +1));
+
+    // estado inicial
     updateButtonState(item.id);
+
+    gridEl.appendChild(clone);
   });
 }
 
-// === Fetch com async/await e loader ===
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
-    const res = await fetch(SHEET_URL);
-    const txt = await res.text();
-    const jsonStr = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
-    const rows = JSON.parse(jsonStr).table.rows;
-    items = rows.map((r, i) => ({
+    const res    = await fetch(SHEET_URL);
+    const txt    = await res.text();
+    const json   = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
+    const rows   = JSON.parse(json).table.rows;
+    items = rows.map((r,i) => ({
       id:      i,
       protein: r.c[0]?.v || '',
       side:    r.c[1]?.v || '',
       price:   parseFloat(r.c[2]?.v) || 0,
-      stock:   parseInt(r.c[3]?.v, 10) || 0
+      stock:   parseInt(r.c[3]?.v,10) || 0
     })).filter(i => i.stock > 0);
     renderItems();
-  } catch (err) {
+  } catch(err) {
     console.error('Erro ao buscar dados:', err);
     gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
   }
