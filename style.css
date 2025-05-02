@@ -3,7 +3,6 @@
 /* === Import de fonte === */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* === Variáveis de cor === */
 :root {
   --brand-orange:    #F29200;
   --brand-green:     #C6D300;
@@ -13,12 +12,10 @@
   --disabled-color:  #999;
 }
 
-/* === Box-sizing === */
 * {
   box-sizing: border-box;
 }
 
-/* === Base === */
 body {
   background: var(--bg-offwhite);
   font-family: 'Inter', sans-serif;
@@ -40,28 +37,29 @@ h1 {
   margin-bottom: 1rem;
 }
 
-/* === Categorias (abas) === */
+/* === Categorias === */
 .categories {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
-  margin-bottom: 1rem;
   flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
-.category-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--brand-orange);
-  background: transparent;
-  color: var(--brand-orange);
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-  font-size: 0.9rem;
-  font-weight: 500;
+/* === Seletor de modo de pedido === */
+.mode-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.category-btn.active {
+.mode-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mode-options .button-secondary.active {
   background-color: var(--brand-orange);
   color: #fff;
   border-color: var(--brand-orange);
@@ -75,7 +73,7 @@ h1 {
   margin: 2rem 0;
 }
 
-/* === Grid de cards === */
+/* === Grid e Cards === */
 .grid {
   display: grid;
   gap: 1.25rem;
@@ -83,7 +81,6 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
-/* === Card de item === */
 .card {
   background: #fff;
   border-radius: 12px;
@@ -96,7 +93,6 @@ h1 {
 .card h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
   margin-bottom: 0.75rem;
 }
 
@@ -105,14 +101,12 @@ h1 {
   margin: 0.4rem 0;
 }
 
-/* === Badge de preço === */
 .price-tag {
   background-color: var(--brand-green);
   color: #fff;
   border-radius: 6px;
   padding: 0.25rem 0.5rem;
   font-weight: 600;
-  font-size: 1.1rem;
   margin-left: 0.25rem;
 }
 
@@ -183,7 +177,7 @@ h1 {
   animation: bump 300ms ease-out;
 }
 
-/* === Sumário & botão Gerar Pedido === */
+/* === Sumário & Botão === */
 .summary {
   display: flex;
   flex-direction: column;
@@ -214,11 +208,6 @@ h1 {
 
 .button-primary:hover {
   opacity: 0.9;
-}
-
-.button-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(242,146,0,0.5);
 }
 
 .button-secondary {
