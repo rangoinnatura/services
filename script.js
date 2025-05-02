@@ -1,7 +1,7 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-// Atenção aqui: adicionamos &t=${Date.now()} para cada chamada, forçando fresh
+// URL base do Sheet
 const BASE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
@@ -72,11 +72,31 @@ function updateQty(id, delta) {
 }
 
 function generateOrder() {
-  const lines = ['Pedido Rango in Natura:'];
-  items.forEach(i => {
-    if (i.qty > 0) lines.push(`• ${i.qty}x ${getItemName(i)}`);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
   });
-  lines.push(`Total: ${totalEl.textContent}`);
+  const timeStr = now.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const lines = [];
+  lines.push('🛒 *Pedido Pronta Entrega Rango in Natura*');
+  lines.push(`📅 ${dateStr} às ${timeStr}`);
+  lines.push(''); // linha em branco
+  items.forEach(item => {
+    if (item.qty > 0) {
+      lines.push(`• ${item.qty}x ${getItemName(item)}`);
+    }
+  });
+  lines.push('');
+  lines.push(`💰 *Total:* ${totalEl.textContent}`);
+  lines.push('');
+  lines.push('Comer bem nunca foi tão fácil! 💚');
+
   outputEl.value = lines.join('\n');
   outputEl.select();
 }
@@ -102,7 +122,9 @@ function renderCategories() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
+  const toShow = items.filter(
+    i => activeCategory === 'Todos' || i.category === activeCategory
+  );
   toShow.forEach(item => {
     const clone = template.content.cloneNode(true);
 
@@ -128,13 +150,13 @@ function renderItems() {
 }
 
 async function fetchSheet() {
-  // adiciona um timestamp único pra quebrar cache
+  // adiciona cache-busting
   const url = `${BASE_SHEET_URL}&t=${Date.now()}`;
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
     const res  = await fetch(url);
     const txt  = await res.text();
-    const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
+    const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
     const rows = JSON.parse(json).table.rows;
     items = rows.map((r,i) => ({
       id:       i,
