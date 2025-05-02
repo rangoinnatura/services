@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -13,10 +14,8 @@
   <main class="container">
     <h1>Pronta Entrega Rango in Natura</h1>
 
-    <!-- aqui entram as abas de categoria -->
     <div id="categories" class="categories"></div>
 
-    <!-- template para os cards -->
     <template id="item-template">
       <div class="card">
         <h2 class="item-name"></h2>
@@ -31,6 +30,14 @@
     </template>
 
     <div id="grid" class="grid"></div>
+
+    <!-- nova seção de modo de pedido -->
+    <div class="mode-options">
+      <span class="mode-label">Modo de pedido:</span>
+      <button type="button" id="mode-entrega" class="button-secondary active">Entrega</button>
+      <button type="button" id="mode-retirada" class="button-secondary">Retirada</button>
+    </div>
+
     <div id="summary" class="summary">
       <p>Total: <strong id="total">R$ 0,00</strong></p>
       <button id="generate" class="button-primary">Gerar Pedido</button>
