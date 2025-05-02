@@ -43,6 +43,14 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
+/* === Loader === */
+.loader {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin: 2rem 0;
+}
+
 /* === Grid de cards === */
 .grid {
   display: grid;
@@ -104,29 +112,22 @@ h1 {
   justify-content: center;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
-
-  /* remove flash roxo no mobile */
   -webkit-tap-highlight-color: transparent;
   outline: none;
 }
 
-/* hover normal */
 .qty-btn:hover:not(:disabled) {
   border-color: #888;
 }
 
-/* foco customizado */
 .qty-btn:focus {
   box-shadow: 0 0 0 3px rgba(242,146,0,0.3);
 }
 
-/* estado ativo suave */
 .qty-btn:active {
   background-color: rgba(242,146,0,0.1);
 }
 
-/* === ESTILO DISABLED REFINADO === */
-/* cor de fundo, borda e texto em cinza claro */
 .qty-btn:disabled {
   background-color: var(--disabled-bg);
   border-color: var(--disabled-border);
@@ -134,13 +135,11 @@ h1 {
   cursor: not-allowed;
 }
 
-/* impedir qualquer mudança ao passar o mouse */
 .qty-btn:disabled:hover {
   background-color: var(--disabled-bg);
   border-color: var(--disabled-border);
 }
 
-/* === Display de quantidade e bump === */
 .qty-display {
   margin: 0 0.75rem;
   min-width: 2rem;
@@ -150,7 +149,6 @@ h1 {
   display: inline-block;
 }
 
-/* animação bump */
 @keyframes bump {
   0%   { transform: scale(1); }
   50%  { transform: scale(1.3); }
@@ -174,7 +172,6 @@ h1 {
   margin-bottom: 0.75rem;
 }
 
-/* Botão primário */
 .button-primary {
   display: flex;
   align-items: center;
@@ -200,7 +197,6 @@ h1 {
   box-shadow: 0 0 0 3px rgba(242,146,0,0.5);
 }
 
-/* Botão secundário (Copiar) */
 .button-secondary {
   display: flex;
   align-items: center;
@@ -231,7 +227,6 @@ h1 {
   border-color: var(--brand-green);
 }
 
-/* === Área do pedido gerado === */
 #order-text {
   width: 100%;
   background-color: #FAFAFA;
@@ -244,7 +239,6 @@ h1 {
   margin-bottom: 0.75rem;
 }
 
-/* === Responsividade === */
 @media (min-width: 600px) {
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
