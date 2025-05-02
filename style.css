@@ -8,6 +8,9 @@
   --brand-orange: #F29200;
   --brand-green:  #C6D300;
   --bg-offwhite:  #fdfcf7;
+  --disabled-bg:  #f5f5f5;
+  --disabled-border: #ddd;
+  --disabled-color: #999;
 }
 
 /* === Reset básico === */
@@ -102,31 +105,42 @@ h1 {
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 
-  /* remove o destaque lilás padrão no mobile */
+  /* remove flash roxo no mobile */
   -webkit-tap-highlight-color: transparent;
   outline: none;
 }
 
-/* foco customizado em qty-btn */
-.qty-btn:focus {
-  box-shadow: 0 0 0 3px rgba(242,146,0,0.3);
-}
-
-/* estado ativo mais sutil */
-.qty-btn:active {
-  background-color: rgba(242,146,0,0.1);
-}
-
+/* hover normal */
 .qty-btn:hover:not(:disabled) {
   border-color: #888;
 }
 
-/* estilo de botão desabilitado */
+/* foco customizado */
+.qty-btn:focus {
+  box-shadow: 0 0 0 3px rgba(242,146,0,0.3);
+}
+
+/* estado ativo suave */
+.qty-btn:active {
+  background-color: rgba(242,146,0,0.1);
+}
+
+/* === ESTILO DISABLED REFINADO === */
+/* cor de fundo, borda e texto em cinza claro */
 .qty-btn:disabled {
-  opacity: 0.5;
+  background-color: var(--disabled-bg);
+  border-color: var(--disabled-border);
+  color: var(--disabled-color);
   cursor: not-allowed;
 }
 
+/* impedir qualquer mudança ao passar o mouse */
+.qty-btn:disabled:hover {
+  background-color: var(--disabled-bg);
+  border-color: var(--disabled-border);
+}
+
+/* === Display de quantidade e bump === */
 .qty-display {
   margin: 0 0.75rem;
   min-width: 2rem;
@@ -136,7 +150,7 @@ h1 {
   display: inline-block;
 }
 
-/* === Animação de bump (já inserida) === */
+/* animação bump */
 @keyframes bump {
   0%   { transform: scale(1); }
   50%  { transform: scale(1.3); }
