@@ -5,19 +5,17 @@
 
 /* === Variáveis de cor === */
 :root {
-  --brand-orange: #F29200;
-  --brand-green:  #C6D300;
-  --bg-offwhite:  #fdfcf7;
-  --disabled-bg:  #f5f5f5;
+  --brand-orange:    #F29200;
+  --brand-green:     #C6D300;
+  --bg-offwhite:     #fdfcf7;
+  --disabled-bg:     #f5f5f5;
   --disabled-border: #ddd;
-  --disabled-color: #999;
+  --disabled-color:  #999;
 }
 
-/* === Reset básico === */
+/* === Box-sizing === */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 /* === Base === */
@@ -128,6 +126,7 @@ h1 {
   background-color: rgba(242,146,0,0.1);
 }
 
+/* disabled refinado */
 .qty-btn:disabled {
   background-color: var(--disabled-bg);
   border-color: var(--disabled-border);
@@ -140,6 +139,7 @@ h1 {
   border-color: var(--disabled-border);
 }
 
+/* === Quantidade & bump === */
 .qty-display {
   margin: 0 0.75rem;
   min-width: 2rem;
@@ -159,7 +159,7 @@ h1 {
   animation: bump 300ms ease-out;
 }
 
-/* === Sumário e botão Gerar Pedido === */
+/* === Sumário & botão Gerar Pedido === */
 .summary {
   display: flex;
   flex-direction: column;
