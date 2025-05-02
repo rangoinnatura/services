@@ -1,7 +1,7 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
+const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 const gridEl   = document.getElementById('grid');
@@ -107,30 +107,26 @@ function renderItems() {
   });
 }
 
-function fetchSheet() {
-  // mostra loader
+// === Fetch com async/await e loader ===
+async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
-
-  fetch(SHEET_URL)
-    .then(r => r.text())
-    .then(txt => {
-      const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
-      return JSON.parse(json).table.rows;
-    })
-    .then(rows => {
-      items = rows.map((r,i) => ({
-        id:      i,
-        protein: r.c[0]?.v||'',
-        side:    r.c[1]?.v||'',
-        price:   parseFloat(r.c[2]?.v)||0,
-        stock:   parseInt(r.c[3]?.v,10)||0
-      })).filter(i=>i.stock>0);
-      renderItems();
-    })
-    .catch(err => {
-      console.error('Erro ao buscar dados:', err);
-      gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
-    });
+  try {
+    const res = await fetch(SHEET_URL);
+    const txt = await res.text();
+    const jsonStr = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
+    const rows = JSON.parse(jsonStr).table.rows;
+    items = rows.map((r, i) => ({
+      id:      i,
+      protein: r.c[0]?.v || '',
+      side:    r.c[1]?.v || '',
+      price:   parseFloat(r.c[2]?.v) || 0,
+      stock:   parseInt(r.c[3]?.v, 10) || 0
+    })).filter(i => i.stock > 0);
+    renderItems();
+  } catch (err) {
+    console.error('Erro ao buscar dados:', err);
+    gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
+  }
 }
 
 genBtn.addEventListener('click', generateOrder);
