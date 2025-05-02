@@ -4,13 +4,16 @@ const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
 const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
-const gridEl   = document.getElementById('grid');
-const totalEl  = document.getElementById('total');
-const genBtn   = document.getElementById('generate');
-const outputEl = document.getElementById('order-text');
-const template  = document.getElementById('item-template');
+let activeCategory = 'Todos';
 
-// cria botão de copiar
+const gridEl       = document.getElementById('grid');
+const totalEl      = document.getElementById('total');
+const genBtn       = document.getElementById('generate');
+const outputEl     = document.getElementById('order-text');
+const categoriesEl = document.getElementById('categories');
+const template     = document.getElementById('item-template');
+
+// Botão “Copiar pedido”
 const copyBtn = document.createElement('button');
 copyBtn.textContent     = 'Copiar pedido';
 copyBtn.className       = 'button-secondary';
@@ -66,7 +69,7 @@ function updateQty(id, delta) {
   el.textContent = qty;
   calcTotal();
 
-  // bump
+  // animação bump
   el.classList.add('bump');
   el.addEventListener('animationend', () => el.classList.remove('bump'), { once: true });
 
@@ -84,12 +87,31 @@ function generateOrder() {
   outputEl.select();
 }
 
+function renderCategories() {
+  // pega categorias únicas
+  const cats = Array.from(new Set(items.map(i => i.category)));
+  cats.unshift('Todos'); // primeira aba
+  categoriesEl.innerHTML = '';
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.textContent = cat;
+    btn.className   = 'category-btn' + (cat === activeCategory ? ' active' : '');
+    btn.addEventListener('click', () => {
+      activeCategory = cat;
+      renderCategories();
+      renderItems();
+    });
+    categoriesEl.appendChild(btn);
+  });
+}
+
 function renderItems() {
   gridEl.innerHTML = '';
-  items.forEach(item => {
+  // filtra por categoria ativa
+  const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
+  toShow.forEach(item => {
     const clone = template.content.cloneNode(true);
 
-    // preencher clone
     clone.querySelector('.item-name').textContent   = getItemName(item);
     clone.querySelector('.price-tag').textContent   = formatBRL(item.price);
     clone.querySelector('.stock-count').textContent = item.stock;
@@ -102,11 +124,9 @@ function renderItems() {
     plusBtn.dataset.id  = item.id;
     qtyEl.id            = `qty-${item.id}`;
 
-    // eventos
     minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn.addEventListener('click',  () => updateQty(item.id, +1));
+    plusBtn .addEventListener('click', () => updateQty(item.id, +1));
 
-    // primeiro adiciona ao DOM, só depois ajusta o estado inicial
     gridEl.appendChild(clone);
     updateButtonState(item.id);
   });
@@ -120,12 +140,15 @@ async function fetchSheet() {
     const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
     const rows = JSON.parse(json).table.rows;
     items = rows.map((r,i) => ({
-      id:      i,
-      protein: r.c[0]?.v || '',
-      side:    r.c[1]?.v || '',
-      price:   parseFloat(r.c[2]?.v) || 0,
-      stock:   parseInt(r.c[3]?.v,10) || 0
+      id:       i,
+      protein:  r.c[0]?.v || '',
+      side:     r.c[1]?.v || '',
+      price:    parseFloat(r.c[2]?.v) || 0,
+      stock:    parseInt(r.c[3]?.v,10) || 0,
+      category: r.c[4]?.v || 'Refeição'
     })).filter(i => i.stock > 0);
+
+    renderCategories();
     renderItems();
   } catch(err) {
     console.error('Erro ao buscar dados:', err);
