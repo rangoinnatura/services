@@ -1,7 +1,7 @@
 // script.js
 
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
-const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
 let items = [];
 const gridEl   = document.getElementById('grid');
@@ -9,13 +9,12 @@ const totalEl  = document.getElementById('total');
 const genBtn   = document.getElementById('generate');
 const outputEl = document.getElementById('order-text');
 
-// cria botão de copiar abaixo do textarea
+// botão “Copiar pedido”
 const copyBtn = document.createElement('button');
 copyBtn.textContent     = 'Copiar pedido';
 copyBtn.className       = 'button-secondary';
 copyBtn.style.width     = '100%';
 copyBtn.style.marginTop = '0.5rem';
-
 copyBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
@@ -28,11 +27,10 @@ copyBtn.addEventListener('click', () => {
     })
     .catch(err => console.error('Erro ao copiar:', err));
 });
-
 outputEl.parentNode.insertBefore(copyBtn, outputEl.nextSibling);
 
-function formatBRL(value) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function formatBRL(v) {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 function getItemName(item) {
@@ -50,14 +48,14 @@ function calcTotal() {
 }
 
 function updateButtonState(id) {
-  const minusBtn = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
-  const plusBtn  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
-  const qtyEl    = document.getElementById(`qty-${id}`);
-  const qty      = parseInt(qtyEl.textContent, 10) || 0;
-  const item     = items.find(i => i.id === id);
+  const minus = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
+  const plus  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
+  const qtyEl = document.getElementById(`qty-${id}`);
+  const qty   = parseInt(qtyEl.textContent, 10) || 0;
+  const item  = items.find(i => i.id === id);
 
-  minusBtn.disabled = qty === 0;
-  plusBtn.disabled  = qty >= item.stock;
+  minus.disabled = qty === 0;
+  plus.disabled  = qty >= item.stock;
 }
 
 function updateQty(id, delta) {
@@ -67,13 +65,9 @@ function updateQty(id, delta) {
   el.textContent = qty;
   calcTotal();
 
-  // animação bump
   el.classList.add('bump');
-  el.addEventListener('animationend', () => {
-    el.classList.remove('bump');
-  }, { once: true });
+  el.addEventListener('animationend', () => el.classList.remove('bump'), { once: true });
 
-  // atualiza estado dos botões
   updateButtonState(id);
 }
 
@@ -81,9 +75,7 @@ function generateOrder() {
   const lines = ['Pedido Rango in Natura:'];
   items.forEach(item => {
     const qty = parseInt(document.getElementById(`qty-${item.id}`).textContent, 10) || 0;
-    if (qty > 0) {
-      lines.push(`• ${qty}x ${getItemName(item)}`);
-    }
+    if (qty > 0) lines.push(`• ${qty}x ${getItemName(item)}`);
   });
   lines.push(`Total: ${totalEl.textContent}`);
   outputEl.value = lines.join('\n');
@@ -92,7 +84,7 @@ function generateOrder() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  items.filter(item => item.stock > 0).forEach(item => {
+  items.filter(i => i.stock > 0).forEach(item => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -107,32 +99,32 @@ function renderItems() {
     `;
     gridEl.appendChild(card);
 
-    const minusBtn = card.querySelector('.qty-btn.minus');
-    const plusBtn  = card.querySelector('.qty-btn.plus');
-
-    minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn.addEventListener('click', () => updateQty(item.id, +1));
-
-    // estado inicial dos botões
+    const minus = card.querySelector('.qty-btn.minus');
+    const plus  = card.querySelector('.qty-btn.plus');
+    minus.addEventListener('click', () => updateQty(item.id, -1));
+    plus.addEventListener('click',  () => updateQty(item.id, +1));
     updateButtonState(item.id);
   });
 }
 
 function fetchSheet() {
+  // mostra loader
+  gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
+
   fetch(SHEET_URL)
-    .then(res => res.text())
+    .then(r => r.text())
     .then(txt => {
-      const jsonStr = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
-      return JSON.parse(jsonStr).table.rows;
+      const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
+      return JSON.parse(json).table.rows;
     })
     .then(rows => {
-      items = rows.map((r, i) => ({
+      items = rows.map((r,i) => ({
         id:      i,
-        protein: r.c[0]?.v || '',
-        side:    r.c[1]?.v || '',
-        price:   parseFloat(r.c[2]?.v) || 0,
-        stock:   parseInt(r.c[3]?.v, 10) || 0
-      })).filter(it => it.stock > 0);
+        protein: r.c[0]?.v||'',
+        side:    r.c[1]?.v||'',
+        price:   parseFloat(r.c[2]?.v)||0,
+        stock:   parseInt(r.c[3]?.v,10)||0
+      })).filter(i=>i.stock>0);
       renderItems();
     })
     .catch(err => {
