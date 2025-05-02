@@ -33,12 +33,38 @@ main.container {
   margin: 0 auto;
 }
 
-/* === Títulos === */
 h1 {
   font-size: 2.25rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* === Categorias (abas) === */
+.categories {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.category-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--brand-orange);
+  background: transparent;
+  color: var(--brand-orange);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.category-btn.active {
+  background-color: var(--brand-orange);
+  color: #fff;
+  border-color: var(--brand-orange);
 }
 
 /* === Loader === */
@@ -126,7 +152,6 @@ h1 {
   background-color: rgba(242,146,0,0.1);
 }
 
-/* disabled refinado */
 .qty-btn:disabled {
   background-color: var(--disabled-bg);
   border-color: var(--disabled-border);
@@ -139,7 +164,6 @@ h1 {
   border-color: var(--disabled-border);
 }
 
-/* === Quantidade & bump === */
 .qty-display {
   margin: 0 0.75rem;
   min-width: 2rem;
