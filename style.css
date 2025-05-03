@@ -47,6 +47,9 @@ h1 {
 }
 
 .category-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: 1px solid var(--brand-orange);
   color: var(--brand-orange);
@@ -54,6 +57,7 @@ h1 {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
   font-weight: 500;
+  line-height: 1;        /* garante alinhamento vertical */
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
