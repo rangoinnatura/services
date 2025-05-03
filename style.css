@@ -151,8 +151,10 @@ h1 {
 .cart-details {
   position: fixed;
   bottom: 60px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
+  max-width: 480px;
   background: #fff;
   max-height: 60%;
   overflow-y: auto;
@@ -177,8 +179,10 @@ h1 {
 .cart-footer {
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
+  max-width: 480px;
   background: #fff;
   border-top: 1px solid #ddd;
   display: flex;
