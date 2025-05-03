@@ -44,7 +44,7 @@ copyBtn.addEventListener('click', () => {
       copyBtn.classList.add('copied');
       // abre WhatsApp após delay
       setTimeout(() => {
-        const waLink = `https://wa.me/55SEU_DDD_SEUNUMERO?text=${encodeURIComponent(outputEl.value)}`;
+        const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(outputEl.value)}`;
         window.open(waLink, '_blank');
         // restaura botão
         copyBtn.innerHTML = `
