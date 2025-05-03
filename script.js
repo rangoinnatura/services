@@ -17,22 +17,22 @@ const viewCartBtn    = document.getElementById('view-cart');
 const cartDetailsEl  = document.getElementById('cart-details');
 const outputEl       = document.getElementById('order-text');
 
-// Botão de envio será criado aqui
+// Botão de envio (WhatsApp) com estilo principal
 const copyBtn = document.createElement('button');
-copyBtn.className = 'button-secondary';
+copyBtn.className = 'button-primary';
 copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Enviar Pedido`;
 copyBtn.addEventListener('click', () => {
-  generateMessage(); // monta data/hora + itens
+  generateFullMessage();
   outputEl.blur();
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
       copyBtn.innerHTML = '✅ Copiado!';
-      copyBtn.classList.add('copied');
+      copyBtn.disabled = true;
       setTimeout(() => {
         const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(outputEl.value)}`;
         window.open(waLink, '_blank');
         copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Enviar Pedido`;
-        copyBtn.classList.remove('copied');
+        copyBtn.disabled = false;
       }, 500);
     })
     .catch(err => console.error('Erro ao copiar:', err));
@@ -79,9 +79,8 @@ function updateQty(id, delta) {
   qtyEl.classList.add('bump');
   qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
 
-  // atualiza total, footer e estado dos botões
   const sum = calcTotal();
-  totalEl.textContent = formatBRL(sum);
+  totalEl.textContent    = formatBRL(sum);
   updateCartFooter(sum);
   updateButtonState(id);
 }
@@ -130,8 +129,20 @@ function renderItems() {
   });
 }
 
-// Monta apenas o corpo da mensagem (itens + total + modo)
-function generateMessage() {
+// Gera preview (apenas itens + total, sem data/hora)
+function generatePreview() {
+  const lines = [];
+  items.forEach(item => {
+    if (item.qty > 0) {
+      lines.push(`• ${item.qty}x ${getItemName(item)}`);
+    }
+  });
+  lines.push(`\nTotal: ${formatBRL(calcTotal())}`);
+  outputEl.value = lines.join('\n');
+}
+
+// Gera mensagem completa (data/hora + itens + total + modo)
+function generateFullMessage() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', {
     day: '2-digit', month: 'long', year: 'numeric'
@@ -146,7 +157,9 @@ function generateMessage() {
     ''
   ];
   items.forEach(item => {
-    if (item.qty > 0) lines.push(`• ${item.qty}x ${getItemName(item)}`);
+    if (item.qty > 0) {
+      lines.push(`• ${item.qty}x ${getItemName(item)}`);
+    }
   });
   lines.push(
     '',
@@ -161,7 +174,7 @@ function generateMessage() {
   outputEl.value = lines.join('\n');
 }
 
-// Atualiza o rodapé com o valor e mostra/oculta conforme total
+// Atualiza o rodapé com o valor e oculta se zerado
 function updateCartFooter(sum) {
   if (sum > 0) {
     cartFooterEl.classList.remove('hidden');
@@ -172,13 +185,13 @@ function updateCartFooter(sum) {
   }
 }
 
-// Ao clicar “Ver Carrinho”, monta mensagem e mostra painel
+// Ao clicar “Ver Carrinho”, exibe/esconde preview
 viewCartBtn.addEventListener('click', () => {
-  generateMessage();
+  generatePreview();
   cartDetailsEl.classList.toggle('hidden');
 });
 
-// Busca dados e inicializa tudo
+// Busca dados e inicializa
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
