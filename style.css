@@ -166,6 +166,8 @@ h1 {
 }
 .cart-footer.hidden { display: none; }
 #cart-total { font-weight: 600; font-size: 1rem; }
+
+/* === “Ver Carrinho” === */
 #view-cart {
   background: var(--brand-orange);
   color: #fff;
@@ -178,7 +180,7 @@ h1 {
 
 /* === Painel de carrinho === */
 .cart-details {
-  position: fixed;
+  position: relative;        /* para o close absolute */
   bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
@@ -194,25 +196,19 @@ h1 {
 }
 .cart-details.hidden { display: none; }
 
-.cart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-.cart-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
+/* Botão de fechar */
 .close-cart {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1.5rem;
+  color: #333;
   background: transparent;
   border: none;
-  font-size: 1.5rem;
-  line-height: 1;
   cursor: pointer;
 }
 
+/* Lista de itens */
 .cart-items {
   list-style: none;
   padding: 0;
@@ -224,17 +220,18 @@ h1 {
   font-size: 1rem;
 }
 
+/* Footer interno do painel só com botão */
 .cart-footer-panel {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
 }
-.cart-footer-panel span {
-  font-weight: 600;
-  font-size: 1rem;
-}
-.cart-footer-panel .button-primary {
-  margin-left: 1rem;
+
+/* Override do botão enviar para ficar laranja */
+#send-order.button-primary {
+  background-color: var(--brand-orange) !important;
+  border-color: var(--brand-orange) !important;
+  color: #fff !important;
 }
 
 @media (min-width: 600px) {
