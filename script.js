@@ -19,7 +19,7 @@ const closeCartBtn   = document.getElementById('close-cart');
 const cartItemsEl    = document.getElementById('cart-items');
 const sendOrderBtn   = document.getElementById('send-order');
 
-// alterna estilo dos modos
+// Alterna o estilo dos modos de pedido
 function updateModeButtons() {
   modeEntrega.classList.toggle('active', orderMode === 'Delivery');
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
@@ -60,12 +60,12 @@ function updateQty(id, delta) {
   qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
 
   const sum = calcTotal();
-  totalEl.textContent  = formatBRL(sum);
+  totalEl.textContent = formatBRL(sum);
   updateCartFooter(sum);
   updateButtonState(id);
 }
 
-// atualiza footer e lista de itens
+// Atualiza rodapé fixo e lista de itens
 function updateCartFooter(sum) {
   if (sum > 0) {
     cartFooterEl.classList.remove('hidden');
@@ -84,7 +84,7 @@ function updateCartFooter(sum) {
   }
 }
 
-// monta a mensagem completa pro WhatsApp
+// Monta a mensagem completa para o WhatsApp
 function generateFullMessage() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', {
@@ -117,36 +117,40 @@ function generateFullMessage() {
   return lines.join('\n');
 }
 
-// abre painel de carrinho
+// Abre painel de carrinho
 viewCartBtn.addEventListener('click', () => {
   updateCartFooter(calcTotal());
   cartDetailsEl.classList.remove('hidden');
 });
 
-// fecha painel
+// Fecha painel de carrinho
 closeCartBtn.addEventListener('click', () => {
   cartDetailsEl.classList.add('hidden');
 });
 
-// envia pedido com delay
+// Envia pedido com feedback imediato e delay fake
 sendOrderBtn.addEventListener('click', () => {
   const msg = generateFullMessage();
+  const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
+
+  // 1) feedback imediato
   sendOrderBtn.textContent = '⏳ Enviando…';
   sendOrderBtn.disabled = true;
+
+  // 2) abre WhatsApp sem bloqueio no mobile
+  window.open(waLink, '_blank');
+
+  // 3) tenta copiar, mas falha não bloqueia
+  navigator.clipboard.writeText(msg).catch(() => {});
+
+  // 4) delay fake para restaurar o botão
   setTimeout(() => {
-    navigator.clipboard.writeText(msg)
-      .then(() => {
-        const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
-        window.open(waLink, '_blank');
-      })
-      .finally(() => {
-        sendOrderBtn.textContent = 'Enviar Pedido';
-        sendOrderBtn.disabled = false;
-      });
+    sendOrderBtn.textContent = 'Enviar Pedido';
+    sendOrderBtn.disabled = false;
   }, 1200);
 });
 
-// renderiza categorias
+// Renderiza categorias
 function renderCategories() {
   const available = new Set(items.map(i => i.category));
   const order     = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
@@ -165,7 +169,7 @@ function renderCategories() {
   });
 }
 
-// renderiza itens
+// Renderiza itens
 function renderItems() {
   gridEl.innerHTML = '';
   const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
@@ -192,7 +196,7 @@ function renderItems() {
   });
 }
 
-// busca dados e inicializa
+// Busca dados e inicializa tudo
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
