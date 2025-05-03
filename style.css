@@ -42,7 +42,6 @@ h1 {
   flex-wrap: wrap;
   margin-bottom: 1rem;
 }
-
 .category-btn {
   display: inline-flex;
   align-items: center;
@@ -54,7 +53,6 @@ h1 {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
   font-weight: 500;
-  line-height: 1;
   cursor: pointer;
   transition: opacity 0.2s;
 }
@@ -151,7 +149,6 @@ h1 {
   justify-content: center;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s;
-  outline: none;
 }
 .qty-btn:hover:not(:disabled) { border-color: #888; }
 .qty-btn:focus { box-shadow: 0 0 0 3px rgba(242,146,0,0.3); }
@@ -219,9 +216,10 @@ h1 {
 /* === Painel de carrinho (slide) === */
 .cart-details {
   position: fixed;
-  bottom: 60px;
+  bottom: 0;
   left: 50%;
-  transform: translate(-50%, 100%);
+  /* empurra totalmente para baixo além do footer de 60px */
+  transform: translate(-50%, calc(100% + 60px));
   width: 100%;
   max-width: 480px;
   background: #fff;
@@ -236,7 +234,7 @@ h1 {
   transform: translate(-50%, 0);
 }
 
-/* Cabeçalho e fechar */
+/* Cabeçalho e botão fechar */
 .cart-header {
   position: relative;
   padding: 0.5rem 0;
@@ -273,7 +271,7 @@ h1 {
   border-bottom: 1px solid #eee;
 }
 
-/* Footer interno fixo */
+/* Footer interno fixo (Enviar Pedido) */
 .cart-footer-panel {
   flex-shrink: 0;
   padding-top: 0.5rem;
@@ -282,7 +280,7 @@ h1 {
   justify-content: flex-end;
 }
 
-/* Override botão enviar laranja */
+/* override botão enviar laranja */
 #send-order.button-primary {
   background-color: var(--brand-orange) !important;
   border-color: var(--brand-orange) !important;
