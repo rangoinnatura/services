@@ -143,36 +143,62 @@ h1 {
 }
 .qty-display.bump { animation: bump 300ms ease-out; }
 
-/* === Sumário & Botões === */
-.summary { display: flex; flex-direction: column; margin-bottom: 1.5rem; }
-.summary p { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.75rem; }
-.button-primary {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; padding: 10px 20px; background-color: var(--brand-orange);
-  color: #fff; border: none; border-radius: 8px; font-size: 1rem;
-  font-weight: 600; transition: opacity 0.2s;
-}
-.button-primary:hover { opacity: 0.9; }
+/* === Sumário === */
+.summary { display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+.summary p { font-size: 1.2rem; font-weight: 600; margin: 0; }
 
-/* === Botão “Fazer pedido” === */
-.button-secondary {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; padding: 10px 20px; background: transparent;
-  color: var(--brand-orange); border: 2px solid var(--brand-orange);
-  border-radius: 8px; font-size: 1rem; font-weight: 600;
-  transition: background-color 0.2s, color 0.2s;
+/* === Painel de detalhes (oculto por padrão) === */
+.cart-details {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  max-height: 60%;
+  overflow-y: auto;
+  padding: 1rem;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
-.button-secondary i {
-  font-size: 1.2rem; margin-right: 8px;
+.cart-details.hidden { display: none; }
+.cart-details textarea {
+  width: 100%;
+  background-color: #FAFAFA;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 1rem;
+  resize: vertical;
+  margin-bottom: 0.75rem;
 }
-.button-secondary:hover { background-color: rgba(242,146,0,0.1); }
-.button-secondary.copied { background-color: var(--brand-green); color: #fff; }
 
-#order-text {
-  width: 100%; background-color: #FAFAFA; border: 1px solid #ddd;
-  border-radius: 8px; padding: 1rem; font-family: monospace;
-  font-size: 1rem; resize: vertical; margin-bottom: 0.75rem;
+/* === Rodapé fixo com total e ação === */
+.cart-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
+.cart-footer.hidden { display: none; }
+#cart-total { font-weight: 600; font-size: 1rem; }
+#view-cart {
+  background: var(--brand-orange);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#view-cart:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @media (min-width: 600px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); }
@@ -180,8 +206,5 @@ h1 {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-  }
-  .button-primary, .button-secondary {
-    width: auto; margin-top: 0;
   }
 }
