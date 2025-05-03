@@ -17,10 +17,9 @@ const viewCartBtn    = document.getElementById('view-cart');
 const cartDetailsEl  = document.getElementById('cart-details');
 const closeCartBtn   = document.getElementById('close-cart');
 const cartItemsEl    = document.getElementById('cart-items');
-const panelTotalEl   = document.getElementById('panel-total');
 const sendOrderBtn   = document.getElementById('send-order');
 
-// Atualiza destaque dos modos
+// alterna estilo dos modos
 function updateModeButtons() {
   modeEntrega.classList.toggle('active', orderMode === 'Delivery');
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
@@ -66,28 +65,26 @@ function updateQty(id, delta) {
   updateButtonState(id);
 }
 
-// Atualiza rodapé e painel de itens
+// atualiza footer e lista de itens
 function updateCartFooter(sum) {
   if (sum > 0) {
     cartFooterEl.classList.remove('hidden');
-    cartTotalEl.textContent = formatBRL(sum);
+    cartTotalEl.textContent = `Total: ${formatBRL(sum)}`;
+    cartItemsEl.innerHTML = '';
+    items.forEach(item => {
+      if (item.qty > 0) {
+        const li = document.createElement('li');
+        li.textContent = `${item.qty}× ${getItemName(item)}`;
+        cartItemsEl.appendChild(li);
+      }
+    });
   } else {
     cartFooterEl.classList.add('hidden');
     cartDetailsEl.classList.add('hidden');
   }
-  // preenche lista do carrinho
-  cartItemsEl.innerHTML = '';
-  items.forEach(item => {
-    if (item.qty > 0) {
-      const li = document.createElement('li');
-      li.textContent = `${item.qty}× ${getItemName(item)}`;
-      cartItemsEl.appendChild(li);
-    }
-  });
-  panelTotalEl.textContent = `Total: ${formatBRL(calcTotal())}`;
 }
 
-// Monta mensagem completa pro WhatsApp e retorna string
+// monta a mensagem completa pro WhatsApp
 function generateFullMessage() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', {
@@ -120,34 +117,36 @@ function generateFullMessage() {
   return lines.join('\n');
 }
 
-// Evento de abrir carrinho
+// abre painel de carrinho
 viewCartBtn.addEventListener('click', () => {
   updateCartFooter(calcTotal());
   cartDetailsEl.classList.remove('hidden');
 });
 
-// Evento de fechar carrinho
+// fecha painel
 closeCartBtn.addEventListener('click', () => {
   cartDetailsEl.classList.add('hidden');
 });
 
-// Evento de envio
+// envia pedido com delay
 sendOrderBtn.addEventListener('click', () => {
   const msg = generateFullMessage();
   sendOrderBtn.textContent = '⏳ Enviando…';
   sendOrderBtn.disabled = true;
-  navigator.clipboard.writeText(msg)
-    .then(() => {
-      const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
-      window.open(waLink, '_blank');
-    })
-    .finally(() => {
-      sendOrderBtn.textContent = 'Enviar Pedido';
-      sendOrderBtn.disabled = false;
-    });
+  setTimeout(() => {
+    navigator.clipboard.writeText(msg)
+      .then(() => {
+        const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
+        window.open(waLink, '_blank');
+      })
+      .finally(() => {
+        sendOrderBtn.textContent = 'Enviar Pedido';
+        sendOrderBtn.disabled = false;
+      });
+  }, 1200);
 });
 
-// Render de categorias e itens
+// renderiza categorias
 function renderCategories() {
   const available = new Set(items.map(i => i.category));
   const order     = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
@@ -166,6 +165,7 @@ function renderCategories() {
   });
 }
 
+// renderiza itens
 function renderItems() {
   gridEl.innerHTML = '';
   const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
@@ -192,7 +192,7 @@ function renderItems() {
   });
 }
 
-// Busca dados e inicia
+// busca dados e inicializa
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
