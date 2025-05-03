@@ -16,7 +16,7 @@ const template     = document.getElementById('item-template');
 const modeEntrega  = document.getElementById('mode-entrega');
 const modeRetirada = document.getElementById('mode-retirada');
 
-// Inicializa botões de modo
+// inicializa botões de modo
 function updateModeButtons() {
   modeEntrega.classList.toggle('active', orderMode === 'Delivery');
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
@@ -25,32 +25,22 @@ modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateMode
 modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
 updateModeButtons();
 
-// Cria botão “Fazer pedido” com <img> do WhatsApp
+// cria botão “Fazer pedido” com ícone do Bootstrap Icons
 const copyBtn = document.createElement('button');
 copyBtn.className       = 'button-secondary';
 copyBtn.style.width     = '100%';
 copyBtn.style.marginTop = '0.5rem';
-copyBtn.innerHTML = `
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-  Fazer pedido
-`;
+copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Fazer pedido`;
 copyBtn.addEventListener('click', () => {
-  // remove foco da textarea
   outputEl.blur();
-  // copia
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
-      copyBtn.textContent = '✅ Copiado!';
+      copyBtn.innerHTML = '✅ Copiado!';
       copyBtn.classList.add('copied');
-      // abre WhatsApp após delay
       setTimeout(() => {
         const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(outputEl.value)}`;
         window.open(waLink, '_blank');
-        // restaura botão
-        copyBtn.innerHTML = `
-          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-          Fazer pedido
-        `;
+        copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Fazer pedido`;
         copyBtn.classList.remove('copied');
       }, 500);
     })
