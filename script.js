@@ -15,29 +15,10 @@ const cartFooterEl   = document.getElementById('cart-footer');
 const cartTotalEl    = document.getElementById('cart-total');
 const viewCartBtn    = document.getElementById('view-cart');
 const cartDetailsEl  = document.getElementById('cart-details');
-const outputEl       = document.getElementById('order-text');
-
-// Botão de envio (WhatsApp) com estilo principal
-const copyBtn = document.createElement('button');
-copyBtn.className = 'button-primary';
-copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Enviar Pedido`;
-copyBtn.addEventListener('click', () => {
-  generateFullMessage();
-  outputEl.blur();
-  navigator.clipboard.writeText(outputEl.value)
-    .then(() => {
-      copyBtn.innerHTML = '✅ Copiado!';
-      copyBtn.disabled = true;
-      setTimeout(() => {
-        const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(outputEl.value)}`;
-        window.open(waLink, '_blank');
-        copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Enviar Pedido`;
-        copyBtn.disabled = false;
-      }, 500);
-    })
-    .catch(err => console.error('Erro ao copiar:', err));
-});
-cartDetailsEl.appendChild(copyBtn);
+const closeCartBtn   = document.getElementById('close-cart');
+const cartItemsEl    = document.getElementById('cart-items');
+const panelTotalEl   = document.getElementById('panel-total');
+const sendOrderBtn   = document.getElementById('send-order');
 
 // Atualiza destaque dos modos
 function updateModeButtons() {
@@ -80,11 +61,93 @@ function updateQty(id, delta) {
   qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
 
   const sum = calcTotal();
-  totalEl.textContent    = formatBRL(sum);
+  totalEl.textContent  = formatBRL(sum);
   updateCartFooter(sum);
   updateButtonState(id);
 }
 
+// Atualiza rodapé e painel de itens
+function updateCartFooter(sum) {
+  if (sum > 0) {
+    cartFooterEl.classList.remove('hidden');
+    cartTotalEl.textContent = formatBRL(sum);
+  } else {
+    cartFooterEl.classList.add('hidden');
+    cartDetailsEl.classList.add('hidden');
+  }
+  // preenche lista do carrinho
+  cartItemsEl.innerHTML = '';
+  items.forEach(item => {
+    if (item.qty > 0) {
+      const li = document.createElement('li');
+      li.textContent = `${item.qty}× ${getItemName(item)}`;
+      cartItemsEl.appendChild(li);
+    }
+  });
+  panelTotalEl.textContent = `Total: ${formatBRL(calcTotal())}`;
+}
+
+// Monta mensagem completa pro WhatsApp e retorna string
+function generateFullMessage() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pt-BR', {
+    day: '2-digit', month: 'long', year: 'numeric'
+  });
+  const timeStr = now.toLocaleTimeString('pt-BR', {
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  const lines = [
+    '🛒 *Pedido Pronta Entrega Rango in Natura*',
+    `📅 ${dateStr} às ${timeStr}`,
+    ''
+  ];
+  items.forEach(item => {
+    if (item.qty > 0) {
+      lines.push(`• ${item.qty}x ${getItemName(item)}`);
+    }
+  });
+  lines.push(
+    '',
+    `💰 *Total:* ${formatBRL(calcTotal())}`,
+    orderMode === 'Delivery'
+      ? '🛵 *Modo de entrega:* Delivery (valor à combinar)'
+      : '🏬 *Modo de entrega:* Retirada',
+    '',
+    'Comer bem nunca foi tão fácil! 💚'
+  );
+
+  return lines.join('\n');
+}
+
+// Evento de abrir carrinho
+viewCartBtn.addEventListener('click', () => {
+  updateCartFooter(calcTotal());
+  cartDetailsEl.classList.remove('hidden');
+});
+
+// Evento de fechar carrinho
+closeCartBtn.addEventListener('click', () => {
+  cartDetailsEl.classList.add('hidden');
+});
+
+// Evento de envio
+sendOrderBtn.addEventListener('click', () => {
+  const msg = generateFullMessage();
+  sendOrderBtn.textContent = '⏳ Enviando…';
+  sendOrderBtn.disabled = true;
+  navigator.clipboard.writeText(msg)
+    .then(() => {
+      const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
+      window.open(waLink, '_blank');
+    })
+    .finally(() => {
+      sendOrderBtn.textContent = 'Enviar Pedido';
+      sendOrderBtn.disabled = false;
+    });
+});
+
+// Render de categorias e itens
 function renderCategories() {
   const available = new Set(items.map(i => i.category));
   const order     = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
@@ -129,69 +192,7 @@ function renderItems() {
   });
 }
 
-// Gera preview (apenas itens + total, sem data/hora)
-function generatePreview() {
-  const lines = [];
-  items.forEach(item => {
-    if (item.qty > 0) {
-      lines.push(`• ${item.qty}x ${getItemName(item)}`);
-    }
-  });
-  lines.push(`\nTotal: ${formatBRL(calcTotal())}`);
-  outputEl.value = lines.join('\n');
-}
-
-// Gera mensagem completa (data/hora + itens + total + modo)
-function generateFullMessage() {
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'long', year: 'numeric'
-  });
-  const timeStr = now.toLocaleTimeString('pt-BR', {
-    hour: '2-digit', minute: '2-digit'
-  });
-
-  const lines = [
-    '🛒 *Pedido Pronta Entrega Rango in Natura*',
-    `📅 ${dateStr} às ${timeStr}`,
-    ''
-  ];
-  items.forEach(item => {
-    if (item.qty > 0) {
-      lines.push(`• ${item.qty}x ${getItemName(item)}`);
-    }
-  });
-  lines.push(
-    '',
-    `💰 *Total:* ${formatBRL(calcTotal())}`,
-    orderMode === 'Delivery'
-      ? '🛵 *Modo de entrega:* Delivery (valor à combinar)'
-      : '🏬 *Modo de entrega:* Retirada',
-    '',
-    'Comer bem nunca foi tão fácil! 💚'
-  );
-
-  outputEl.value = lines.join('\n');
-}
-
-// Atualiza o rodapé com o valor e oculta se zerado
-function updateCartFooter(sum) {
-  if (sum > 0) {
-    cartFooterEl.classList.remove('hidden');
-    cartTotalEl.textContent = formatBRL(sum);
-  } else {
-    cartFooterEl.classList.add('hidden');
-    cartDetailsEl.classList.add('hidden');
-  }
-}
-
-// Ao clicar “Ver Carrinho”, exibe/esconde preview
-viewCartBtn.addEventListener('click', () => {
-  generatePreview();
-  cartDetailsEl.classList.toggle('hidden');
-});
-
-// Busca dados e inicializa
+// Busca dados e inicia
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
