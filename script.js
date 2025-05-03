@@ -16,7 +16,7 @@ const template     = document.getElementById('item-template');
 const modeEntrega  = document.getElementById('mode-entrega');
 const modeRetirada = document.getElementById('mode-retirada');
 
-// Modo de pedido
+// Inicializa botões de modo
 function updateModeButtons() {
   modeEntrega.classList.toggle('active', orderMode === 'Delivery');
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
@@ -169,7 +169,12 @@ async function fetchSheet() {
       stock:    parseInt(r.c[3]?.v,10) || 0,
       category: r.c[4]?.v || 'Refeição',
       qty:      0
-    })).filter(i => i.stock > 0);
+    }))
+    .filter(item => 
+      item.stock > 0 &&
+      item.price > 0 &&
+      Boolean(item.protein)
+    );
 
     renderCategories();
     renderItems();
