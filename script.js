@@ -22,94 +22,33 @@ function updateModeButtons() {
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
 }
 modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateModeButtons(); });
-modeRetirada.addEventListener('click',  () => { orderMode = 'Retirada';  updateModeButtons(); });
+modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
 updateModeButtons();
 
-// Cria botão “Fazer pedido” com SVG inline
+// Cria botão “Fazer pedido” com <img> do WhatsApp
 const copyBtn = document.createElement('button');
 copyBtn.className       = 'button-secondary';
 copyBtn.style.width     = '100%';
 copyBtn.style.marginTop = '0.5rem';
 copyBtn.innerHTML = `
-  <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor"
-       style="vertical-align:middle;margin-right:8px;">
-    <path d="M380.9 97.1c-41.4-41.4-97.1-64.2-156.4-64.2-59.3
-      0-115 22.8-156.4 64.2-41.4 41.4-64.2 97.1-64.2
-      156.4 0 59.3 22.8 115 64.2 156.4l-42.3
-      147.4 147.4-42.3c41.4 41.4 97.1 64.2 156.4
-      64.2 59.3 0 115-22.8 156.4-64.2 41.4-41.4
-      64.2-97.1 64.2-156.4 0-59.3-22.8-115-64.2-156.4zM256.2
-      378.3c-18.4 0-36.5-4.9-51.9-14.1l-7.4-4.4-46.3
-      13.3 13.3-46.3-4.4-7.4c-9.2-15.4-14.1-33.5-14.1-51.9
-      0-64.6 52.4-117 117-117 31.3 0 60.2 12.2
-      82.2 34.3 22.1 22.1 34.3 50.9 34.3
-      82.2-.1 64.6-52.5 117-117.1 117zm63.2-85.6c-9.7-4.8-57
-      -28.1-65.8-31.3-8.8-3.2-15.2-4.9-21.6 4.8s-24.8
-      31.3-30.4 37.7c-5.6 6.4-11.3 7.2-20.9
-      2.4-9.7-4.8-40.9-15.1-78-48.3-28.8-25.6-48.2-57.3
-      -53.9-67-5.6-9.7-.6-15 4.2-19.8
-      4.3-4.3 9.7-11.3 14.6-17
-      4.8-5.6 6.4-9.7 9.7-16.1
-      3.2-6.4 1.6-12 0.8-16.8-0.8-4.8-21.6-52-29.6-71.3
-      -7.8-19.4-15.7-16.8-21.6-17.1-5.6-.3-12.8-.8-19.5-.8
-      -6.6 0-17.1 2.4-26.1
-      12-9 9.7-34.3 33.5-34.3
-      81.5s35.1 94.6 40.1
-      101.3c5 6.6 69.1 105.5
-      167.6 147.8 23.4 10.1
-      41.6 16.2 55.9
-      20.7 23.5 7.6
-      44.8 6.5 61.6
-      3.9 18.8-2.9 57-23.3
-      65.1-45.8 8.1-22.8
-      8.1-42.4 5.7-45.8
-      -2.4-3.3-8.8-5.6-18.5-10.4z"/>
-  </svg>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
   Fazer pedido
 `;
 copyBtn.addEventListener('click', () => {
+  // remove foco da textarea
+  outputEl.blur();
+  // copia
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
-      copyBtn.innerHTML = '✅ Copiado!';
+      copyBtn.textContent = '✅ Copiado!';
       copyBtn.classList.add('copied');
+      // abre WhatsApp após delay
       setTimeout(() => {
-        const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(outputEl.value)}`;
+        const waLink = `https://wa.me/55SEU_DDD_SEUNUMERO?text=${encodeURIComponent(outputEl.value)}`;
         window.open(waLink, '_blank');
+        // restaura botão
         copyBtn.innerHTML = `
-          <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor"
-               style="vertical-align:middle;margin-right:8px;">
-            <path d="M380.9 97.1c-41.4-41.4-97.1-64.2-156.4-64.2-59.3
-              0-115 22.8-156.4 64.2-41.4 41.4-64.2 97.1-64.2
-              156.4 0 59.3 22.8 115 64.2 156.4l-42.3
-              147.4 147.4-42.3c41.4 41.4 97.1 64.2 156.4
-              64.2 59.3 0 115-22.8 156.4-64.2 41.4-41.4
-              64.2-97.1 64.2-156.4 0-59.3-22.8-115-64.2-156.4zM256.2
-              378.3c-18.4 0-36.5-4.9-51.9-14.1l-7.4-4.4-46.3
-              13.3 13.3-46.3-4.4-7.4c-9.2-15.4-14.1-33.5-14.1-51.9
-              0-64.6 52.4-117 117-117 31.3 0 60.2 12.2
-              82.2 34.3 22.1 22.1 34.3 50.9 34.3
-              82.2-.1 64.6-52.5 117-117.1 117zm63.2-85.6c-9.7-4.8-57
-              -28.1-65.8-31.3-8.8-3.2-15.2-4.9-21.6 4.8s-24.8
-              31.3-30.4 37.7c-5.6 6.4-11.3 7.2-20.9
-              2.4-9.7-4.8-40.9-15.1-78-48.3-28.8-25.6-48.2-57.3
-              -53.9-67-5.6-9.7-.6-15 4.2-19.8
-              4.3-4.3 9.7-11.3 14.6-17
-              4.8-5.6 6.4-9.7 9.7-16.1
-              3.2-6.4 1.6-12 0.8-16.8-0.8-4.8-21.6-52-29.6-71.3
-              -7.8-19.4-15.7-16.8-21.6-17.1-5.6-.3-12.8-.8-19.5-.8
-              -6.6 0-17.1 2.4-26.1
-              12-9 9.7-34.3 33.5-34.3
-              81.5s35.1 94.6 40.1
-              101.3c5 6.6 69.1 105.5
-              167.6 147.8 23.4 10.1
-              41.6 16.2 55.9
-              20.7 23.5 7.6
-              44.8 6.5 61.6
-              3.9 18.8-2.9 57-23.3
-              65.1-45.8 8.1-22.8
-              8.1-42.4 5.7-45.8
-              -2.4-3.3-8.8-5.6-18.5-10.4z"/>
-          </svg>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
           Fazer pedido
         `;
         copyBtn.classList.remove('copied');
@@ -126,7 +65,7 @@ function formatBRL(v) {
 function getItemName(item) {
   return item.protein && item.side
     ? `${item.protein} + ${item.side}`
-    : item.protein || item.side || '';
+    : item.protein || '';
 }
 
 function calcTotal() {
@@ -162,22 +101,23 @@ function generateOrder() {
     hour: '2-digit', minute: '2-digit'
   });
 
-  const lines = [];
-  lines.push('🛒 *Pedido Pronta Entrega Rango in Natura*');
-  lines.push(`📅 ${dateStr} às ${timeStr}`);
-  lines.push('');
+  const lines = [
+    '🛒 *Pedido Pronta Entrega Rango in Natura*',
+    `📅 ${dateStr} às ${timeStr}`,
+    ''
+  ];
   items.forEach(item => {
     if (item.qty > 0) lines.push(`• ${item.qty}x ${getItemName(item)}`);
   });
-  lines.push('');
-  lines.push(`💰 *Total:* ${totalEl.textContent}`);
-  if (orderMode === 'Delivery') {
-    lines.push(`🛵 *Modo de entrega:* Delivery (valor à combinar)`);
-  } else {
-    lines.push(`🏬 *Modo de entrega:* Retirada`);
-  }
-  lines.push('');
-  lines.push('Comer bem nunca foi tão fácil! 💚');
+  lines.push(
+    '',
+    `💰 *Total:* ${totalEl.textContent}`,
+    orderMode === 'Delivery'
+      ? '🛵 *Modo de entrega:* Delivery (valor à combinar)'
+      : '🏬 *Modo de entrega:* Retirada',
+    '',
+    'Comer bem nunca foi tão fácil! 💚'
+  );
 
   outputEl.value = lines.join('\n');
   outputEl.select();
@@ -220,7 +160,7 @@ function renderItems() {
     qtyEl.textContent   = item.qty;
 
     minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn.addEventListener('click',  () => updateQty(item.id, +1));
+    plusBtn.addEventListener('click', () => updateQty(item.id, +1));
 
     gridEl.appendChild(clone);
     updateButtonState(item.id);
