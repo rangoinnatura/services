@@ -178,9 +178,9 @@ h1 {
 }
 #view-cart:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* === Painel de carrinho === */
+/* === Painel de carrinho agora fixo === */
 .cart-details {
-  position: relative;        /* para o close absolute */
+  position: fixed;
   bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
