@@ -38,12 +38,24 @@
       <button type="button" id="mode-retirada" class="mode-button">Retirada</button>
     </div>
 
-    <div id="summary" class="summary">
+    <div class="summary">
       <p>Total: <strong id="total">R$ 0,00</strong></p>
-      <button id="generate" class="button-primary">Gerar Pedido</button>
+      <!-- botão “Gerar Pedido” removido conforme fluxo em tempo real -->
     </div>
-    <textarea id="order-text" placeholder="Seu pedido aparecerá aqui…" readonly rows="6"></textarea>
+
+    <!-- Painel de detalhes (textarea + botão WhatsApp) -->
+    <div id="cart-details" class="cart-details hidden">
+      <textarea id="order-text" placeholder="Seu pedido aparecerá aqui…" readonly rows="6"></textarea>
+      <!-- o botão de envio será injetado via JS dentro deste painel -->
+    </div>
   </main>
+
+  <!-- Rodapé fixo com total e “Ver Carrinho” -->
+  <div id="cart-footer" class="cart-footer hidden">
+    <span id="cart-total">R$ 0,00</span>
+    <button id="view-cart">Ver Carrinho</button>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
