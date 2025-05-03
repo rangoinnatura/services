@@ -33,7 +33,7 @@ function calcTotal() {
   return items.reduce((sum, i) => sum + i.qty * i.price, 0);
 }
 
-// Modos de pedido
+// Modo Delivery/Retirada
 function updateModeButtons() {
   modeEntrega.classList.toggle('active', orderMode === 'Delivery');
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
@@ -65,7 +65,7 @@ function updateQty(id, delta) {
   updateButtonState(id);
 }
 
-// Atualiza rodapé e lista de itens
+// Atualiza rodapé fixo e lista
 function updateCartFooter(sum) {
   if (sum > 0) {
     cartFooterEl.style.display = 'flex';
@@ -84,7 +84,7 @@ function updateCartFooter(sum) {
   }
 }
 
-// Mensagem completa
+// Monta texto completo
 function generateFullMessage() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -112,7 +112,7 @@ function generateFullMessage() {
   return lines.join('\n');
 }
 
-// Abrir/fechar painel
+// Abrir / Fechar painel
 function openPanel() {
   cartDetailsEl.classList.add('open');
   viewCartBtn.style.display = 'none';
@@ -131,20 +131,17 @@ closeCartBtn.addEventListener('click', closePanel);
 sendOrderBtn.addEventListener('click', () => {
   const msg = generateFullMessage();
   const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
-
   sendOrderBtn.textContent = '⏳ Enviando…';
   sendOrderBtn.disabled = true;
-
   window.open(waLink, '_blank');
   navigator.clipboard.writeText(msg).catch(() => {});
-
   setTimeout(() => {
     sendOrderBtn.textContent = 'Enviar Pedido';
     sendOrderBtn.disabled = false;
   }, 1200);
 });
 
-// Render categorias e itens
+// Render categories & items
 function renderCategories() {
   const avail = new Set(items.map(i => i.category));
   const order = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
@@ -189,7 +186,7 @@ function renderItems() {
     });
 }
 
-// Fetch e init
+// Fetch & init
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
