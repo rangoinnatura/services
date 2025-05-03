@@ -5,227 +5,186 @@ let items = [];
 let activeCategory = 'Todos';
 let orderMode = 'Delivery';
 
-const gridEl         = document.getElementById('grid');
-const totalEl        = document.getElementById('total');
-const categoriesEl   = document.getElementById('categories');
-const template       = document.getElementById('item-template');
-const modeEntrega    = document.getElementById('mode-entrega');
-const modeRetirada   = document.getElementById('mode-retirada');
-const cartFooterEl   = document.getElementById('cart-footer');
-const cartTotalEl    = document.getElementById('cart-total');
-const viewCartBtn    = document.getElementById('view-cart');
-const cartDetailsEl  = document.getElementById('cart-details');
-const closeCartBtn   = document.getElementById('close-cart');
-const cartItemsEl    = document.getElementById('cart-items');
-const sendOrderBtn   = document.getElementById('send-order');
-
-// Alterna o estilo dos modos de pedido
-function updateModeButtons() {
-  modeEntrega.classList.toggle('active', orderMode === 'Delivery');
-  modeRetirada.classList.toggle('active', orderMode === 'Retirada');
-}
-modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateModeButtons(); });
-modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
-updateModeButtons();
+const gridEl        = document.getElementById('grid');
+const totalEl       = document.getElementById('total');
+const categoriesEl  = document.getElementById('categories');
+const template      = document.getElementById('item-template');
+const modeEntrega   = document.getElementById('mode-entrega');
+const modeRetirada  = document.getElementById('mode-retirada');
+const cartFooterEl  = document.getElementById('cart-footer');
+const cartTotalEl   = document.getElementById('cart-total');
+const viewCartBtn   = document.getElementById('view-cart');
+const cartDetailsEl = document.getElementById('cart-details');
+const closeCartBtn  = document.getElementById('close-cart');
+const cartItemsEl   = document.getElementById('cart-items');
+const sendOrderBtn  = document.getElementById('send-order');
 
 function formatBRL(v) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 }
-
-function getItemName(item) {
-  return item.protein && item.side
-    ? `${item.protein} + ${item.side}`
-    : item.protein || '';
+function getItemName(i) {
+  return i.protein && i.side ? `${i.protein} + ${i.side}` : i.protein||'';
 }
-
 function calcTotal() {
-  return items.reduce((acc, i) => acc + i.qty * i.price, 0);
+  return items.reduce((s,i)=>s + i.qty * i.price, 0);
 }
+function updateModeButtons(){
+  modeEntrega.classList.toggle('active',orderMode==='Delivery');
+  modeRetirada.classList.toggle('active',orderMode==='Retirada');
+}
+modeEntrega.addEventListener('click',()=>{orderMode='Delivery';updateModeButtons();});
+modeRetirada.addEventListener('click',()=>{orderMode='Retirada';updateModeButtons();});
+updateModeButtons();
 
-function updateButtonState(id) {
+function updateButtonState(id){
   const minus = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
   const plus  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
-  const item  = items[id];
-  minus.disabled = item.qty === 0;
-  plus.disabled  = item.qty >= item.stock;
+  const it    = items[id];
+  minus.disabled = it.qty===0;
+  plus.disabled  = it.qty>=it.stock;
 }
 
-function updateQty(id, delta) {
-  const item = items[id];
-  item.qty = Math.max(0, item.qty + delta);
-
+function updateQty(id,delta){
+  const it = items[id];
+  it.qty = Math.max(0,it.qty+delta);
   const qtyEl = document.getElementById(`qty-${id}`);
-  qtyEl.textContent = item.qty;
+  qtyEl.textContent = it.qty;
   qtyEl.classList.add('bump');
-  qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
-
+  qtyEl.addEventListener('animationend',()=>qtyEl.classList.remove('bump'),{once:true});
   const sum = calcTotal();
   totalEl.textContent = formatBRL(sum);
   updateCartFooter(sum);
   updateButtonState(id);
 }
 
-// Atualiza rodapé fixo e lista de itens
-function updateCartFooter(sum) {
-  if (sum > 0) {
-    cartFooterEl.classList.remove('hidden');
+function updateCartFooter(sum){
+  if(sum>0){
+    cartFooterEl.style.display = 'flex';
     cartTotalEl.textContent = `Total: ${formatBRL(sum)}`;
     cartItemsEl.innerHTML = '';
-    items.forEach(item => {
-      if (item.qty > 0) {
+    items.forEach(i=>{
+      if(i.qty>0){
         const li = document.createElement('li');
-        li.textContent = `${item.qty}× ${getItemName(item)}`;
+        li.textContent = `${i.qty}× ${getItemName(i)}`;
         cartItemsEl.appendChild(li);
       }
     });
   } else {
-    cartFooterEl.classList.add('hidden');
-    cartDetailsEl.classList.add('hidden');
+    cartFooterEl.style.display = 'none';
+    closePanel();
   }
 }
 
-// Monta a mensagem completa para o WhatsApp
-function generateFullMessage() {
+function generateFullMessage(){
   const now = new Date();
-  const dateStr = now.toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'long', year: 'numeric'
-  });
-  const timeStr = now.toLocaleTimeString('pt-BR', {
-    hour: '2-digit', minute: '2-digit'
-  });
-
+  const dateStr = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const timeStr = now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const lines = [
     '🛒 *Pedido Pronta Entrega Rango in Natura*',
-    `📅 ${dateStr} às ${timeStr}`,
-    ''
+    `📅 ${dateStr} às ${timeStr}`,''
   ];
-  items.forEach(item => {
-    if (item.qty > 0) {
-      lines.push(`• ${item.qty}x ${getItemName(item)}`);
-    }
-  });
+  items.forEach(i=>{ if(i.qty>0) lines.push(`• ${i.qty}x ${getItemName(i)}`); });
   lines.push(
-    '',
-    `💰 *Total:* ${formatBRL(calcTotal())}`,
-    orderMode === 'Delivery'
+    '','💰 *Total:* '+formatBRL(calcTotal()),
+    orderMode==='Delivery'
       ? '🛵 *Modo de entrega:* Delivery (valor à combinar)'
       : '🏬 *Modo de entrega:* Retirada',
-    '',
-    'Comer bem nunca foi tão fácil! 💚'
+    '','Comer bem nunca foi tão fácil! 💚'
   );
-
   return lines.join('\n');
 }
 
-// Abre painel de carrinho
-viewCartBtn.addEventListener('click', () => {
+function openPanel(){
+  cartDetailsEl.classList.add('open');
+  viewCartBtn.style.display = 'none';
+}
+function closePanel(){
+  cartDetailsEl.classList.remove('open');
+  viewCartBtn.style.display = 'inline-block';
+}
+
+// eventos abrir/fechar
+viewCartBtn.addEventListener('click',()=>{
   updateCartFooter(calcTotal());
-  cartDetailsEl.classList.remove('hidden');
+  openPanel();
 });
+closeCartBtn.addEventListener('click',closePanel);
 
-// Fecha painel de carrinho
-closeCartBtn.addEventListener('click', () => {
-  cartDetailsEl.classList.add('hidden');
-});
-
-// Envia pedido com feedback imediato e delay fake
-sendOrderBtn.addEventListener('click', () => {
+// enviar pedido
+sendOrderBtn.addEventListener('click',()=>{
   const msg = generateFullMessage();
   const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
-
-  // 1) feedback imediato
   sendOrderBtn.textContent = '⏳ Enviando…';
   sendOrderBtn.disabled = true;
-
-  // 2) abre WhatsApp sem bloqueio no mobile
-  window.open(waLink, '_blank');
-
-  // 3) tenta copiar, mas falha não bloqueia
-  navigator.clipboard.writeText(msg).catch(() => {});
-
-  // 4) delay fake para restaurar o botão
-  setTimeout(() => {
+  window.open(waLink,'_blank');
+  navigator.clipboard.writeText(msg).catch(()=>{});
+  setTimeout(()=>{
     sendOrderBtn.textContent = 'Enviar Pedido';
     sendOrderBtn.disabled = false;
-  }, 1200);
+  },1200);
 });
 
-// Renderiza categorias
-function renderCategories() {
-  const available = new Set(items.map(i => i.category));
-  const order     = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
-  const cats      = order.filter(cat => cat === 'Todos' || available.has(cat));
+function renderCategories(){
+  const avail = new Set(items.map(i=>i.category));
+  const order = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
   categoriesEl.innerHTML = '';
-  cats.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.textContent = cat;
-    btn.className = 'category-btn' + (cat === activeCategory ? ' active' : '');
-    btn.addEventListener('click', () => {
-      activeCategory = cat;
-      renderCategories();
-      renderItems();
-    });
-    categoriesEl.appendChild(btn);
+  order.forEach(cat=>{
+    if(cat==='Todos' || avail.has(cat)){
+      const btn = document.createElement('button');
+      btn.textContent = cat;
+      btn.className = 'category-btn'+(cat===activeCategory?' active':'');
+      btn.addEventListener('click',()=>{
+        activeCategory = cat;
+        renderCategories();
+        renderItems();
+      });
+      categoriesEl.appendChild(btn);
+    }
   });
 }
 
-// Renderiza itens
-function renderItems() {
+function renderItems(){
   gridEl.innerHTML = '';
-  const toShow = items.filter(i => activeCategory === 'Todos' || i.category === activeCategory);
-  toShow.forEach(item => {
-    const clone = template.content.cloneNode(true);
-    clone.querySelector('.item-name').textContent   = getItemName(item);
-    clone.querySelector('.price-tag').textContent   = formatBRL(item.price);
-    clone.querySelector('.stock-count').textContent = item.stock;
-
-    const minusBtn = clone.querySelector('.qty-btn.minus');
-    const plusBtn  = clone.querySelector('.qty-btn.plus');
-    const qtyEl    = clone.querySelector('.qty-display');
-
-    minusBtn.dataset.id = item.id;
-    plusBtn.dataset.id  = item.id;
-    qtyEl.id            = `qty-${item.id}`;
-    qtyEl.textContent   = item.qty;
-
-    minusBtn.addEventListener('click', () => updateQty(item.id, -1));
-    plusBtn.addEventListener('click', () => updateQty(item.id, +1));
-
-    gridEl.appendChild(clone);
-    updateButtonState(item.id);
-  });
+  items.filter(i=>activeCategory==='Todos'||i.category===activeCategory)
+    .forEach(item=>{
+      const clone = template.content.cloneNode(true);
+      clone.querySelector('.item-name').textContent = getItemName(item);
+      clone.querySelector('.price-tag').textContent = formatBRL(item.price);
+      clone.querySelector('.stock-count').textContent = item.stock;
+      const minus = clone.querySelector('.qty-btn.minus');
+      const plus  = clone.querySelector('.qty-btn.plus');
+      const qtyEl = clone.querySelector('.qty-display');
+      minus.dataset.id = plus.dataset.id = item.id;
+      qtyEl.id = `qty-${item.id}`; qtyEl.textContent = item.qty;
+      minus.addEventListener('click',()=>updateQty(item.id,-1));
+      plus.addEventListener('click',()=>updateQty(item.id,1));
+      gridEl.appendChild(clone);
+      updateButtonState(item.id);
+    });
 }
 
-// Busca dados e inicializa tudo
-async function fetchSheet() {
+async function fetchSheet(){
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
-  try {
-    const res  = await fetch(`${BASE_SHEET_URL}&t=${Date.now()}`);
-    const txt  = await res.text();
-    const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
+  try{
+    const res = await fetch(`${BASE_SHEET_URL}&t=${Date.now()}`);
+    const txt = await res.text();
+    const json = txt.slice(txt.indexOf('{'),txt.lastIndexOf('}')+1);
     const rows = JSON.parse(json).table.rows;
-    items = rows.map((r,i) => ({
-      id:       i,
-      protein:  r.c[0]?.v || '',
-      side:     r.c[1]?.v || '',
-      price:    parseFloat(r.c[2]?.v) || 0,
-      stock:    parseInt(r.c[3]?.v,10) || 0,
-      category: r.c[4]?.v || 'Refeição',
-      qty:      0
-    }))
-    .filter(item =>
-      item.stock > 0 &&
-      item.price > 0 &&
-      Boolean(item.protein)
-    );
-
+    items = rows.map((r,i)=>({
+      id:i,
+      protein:r.c[0]?.v||'',
+      side:r.c[1]?.v||'',
+      price:parseFloat(r.c[2]?.v)||0,
+      stock:parseInt(r.c[3]?.v,10)||0,
+      category:r.c[4]?.v||'Refeição',
+      qty:0
+    })).filter(i=>i.stock>0&&i.price>0&&i.protein);
     renderCategories();
     renderItems();
-    const initialSum = calcTotal();
-    totalEl.textContent = formatBRL(initialSum);
-    updateCartFooter(initialSum);
-  } catch(err) {
-    console.error('Erro ao buscar dados:', err);
+    totalEl.textContent = formatBRL(calcTotal());
+    updateCartFooter(calcTotal());
+  }catch(e){
+    console.error(e);
     gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
   }
 }
