@@ -147,35 +147,7 @@ h1 {
 .summary { display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
 .summary p { font-size: 1.2rem; font-weight: 600; margin: 0; }
 
-/* === Painel de detalhes (oculto por padrão) === */
-.cart-details {
-  position: fixed;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  background: #fff;
-  max-height: 60%;
-  overflow-y: auto;
-  padding: 1rem;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-  z-index: 1000;
-}
-.cart-details.hidden { display: none; }
-.cart-details textarea {
-  width: 100%;
-  background-color: #FAFAFA;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  font-family: monospace;
-  font-size: 1rem;
-  resize: vertical;
-  margin-bottom: 0.75rem;
-}
-
-/* === Rodapé fixo com total e ação === */
+/* === Rodapé fixo com total e ação "Ver Carrinho" === */
 .cart-footer {
   position: fixed;
   bottom: 0;
@@ -203,6 +175,67 @@ h1 {
   cursor: pointer;
 }
 #view-cart:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* === Painel de carrinho === */
+.cart-details {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  height: auto;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 1rem;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+.cart-details.hidden { display: none; }
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.cart-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.close-cart {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cart-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.cart-items li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 1rem;
+}
+
+.cart-footer-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cart-footer-panel span {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.cart-footer-panel .button-primary {
+  margin-left: 1rem;
+}
 
 @media (min-width: 600px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); }
