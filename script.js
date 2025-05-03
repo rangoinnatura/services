@@ -1,5 +1,3 @@
-// script.js
-
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
 const BASE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
@@ -7,31 +5,24 @@ let items = [];
 let activeCategory = 'Todos';
 let orderMode = 'Delivery';
 
-const gridEl       = document.getElementById('grid');
-const totalEl      = document.getElementById('total');
-const genBtn       = document.getElementById('generate');
-const outputEl     = document.getElementById('order-text');
-const categoriesEl = document.getElementById('categories');
-const template     = document.getElementById('item-template');
-const modeEntrega  = document.getElementById('mode-entrega');
-const modeRetirada = document.getElementById('mode-retirada');
+const gridEl         = document.getElementById('grid');
+const totalEl        = document.getElementById('total');
+const categoriesEl   = document.getElementById('categories');
+const template       = document.getElementById('item-template');
+const modeEntrega    = document.getElementById('mode-entrega');
+const modeRetirada   = document.getElementById('mode-retirada');
+const cartFooterEl   = document.getElementById('cart-footer');
+const cartTotalEl    = document.getElementById('cart-total');
+const viewCartBtn    = document.getElementById('view-cart');
+const cartDetailsEl  = document.getElementById('cart-details');
+const outputEl       = document.getElementById('order-text');
 
-// inicializa botões de modo
-function updateModeButtons() {
-  modeEntrega.classList.toggle('active', orderMode === 'Delivery');
-  modeRetirada.classList.toggle('active', orderMode === 'Retirada');
-}
-modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateModeButtons(); });
-modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
-updateModeButtons();
-
-// cria botão “Fazer pedido” com ícone do Bootstrap Icons
+// Botão de envio será criado aqui
 const copyBtn = document.createElement('button');
-copyBtn.className       = 'button-secondary';
-copyBtn.style.width     = '100%';
-copyBtn.style.marginTop = '0.5rem';
-copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Fazer pedido`;
+copyBtn.className = 'button-secondary';
+copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Enviar Pedido`;
 copyBtn.addEventListener('click', () => {
+  generateMessage(); // monta data/hora + itens
   outputEl.blur();
   navigator.clipboard.writeText(outputEl.value)
     .then(() => {
@@ -40,13 +31,22 @@ copyBtn.addEventListener('click', () => {
       setTimeout(() => {
         const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(outputEl.value)}`;
         window.open(waLink, '_blank');
-        copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Fazer pedido`;
+        copyBtn.innerHTML = `<i class="bi bi-whatsapp"></i> Enviar Pedido`;
         copyBtn.classList.remove('copied');
       }, 500);
     })
     .catch(err => console.error('Erro ao copiar:', err));
 });
-outputEl.parentNode.insertBefore(copyBtn, outputEl.nextSibling);
+cartDetailsEl.appendChild(copyBtn);
+
+// Atualiza destaque dos modos
+function updateModeButtons() {
+  modeEntrega.classList.toggle('active', orderMode === 'Delivery');
+  modeRetirada.classList.toggle('active', orderMode === 'Retirada');
+}
+modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateModeButtons(); });
+modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
+updateModeButtons();
 
 function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -59,8 +59,7 @@ function getItemName(item) {
 }
 
 function calcTotal() {
-  const sum = items.reduce((acc, i) => acc + i.qty * i.price, 0);
-  totalEl.textContent = formatBRL(sum);
+  return items.reduce((acc, i) => acc + i.qty * i.price, 0);
 }
 
 function updateButtonState(id) {
@@ -74,43 +73,17 @@ function updateButtonState(id) {
 function updateQty(id, delta) {
   const item = items[id];
   item.qty = Math.max(0, item.qty + delta);
+
   const qtyEl = document.getElementById(`qty-${id}`);
   qtyEl.textContent = item.qty;
-  calcTotal();
   qtyEl.classList.add('bump');
   qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
+
+  // atualiza total, footer e estado dos botões
+  const sum = calcTotal();
+  totalEl.textContent = formatBRL(sum);
+  updateCartFooter(sum);
   updateButtonState(id);
-}
-
-function generateOrder() {
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'long', year: 'numeric'
-  });
-  const timeStr = now.toLocaleTimeString('pt-BR', {
-    hour: '2-digit', minute: '2-digit'
-  });
-
-  const lines = [
-    '🛒 *Pedido Pronta Entrega Rango in Natura*',
-    `📅 ${dateStr} às ${timeStr}`,
-    ''
-  ];
-  items.forEach(item => {
-    if (item.qty > 0) lines.push(`• ${item.qty}x ${getItemName(item)}`);
-  });
-  lines.push(
-    '',
-    `💰 *Total:* ${totalEl.textContent}`,
-    orderMode === 'Delivery'
-      ? '🛵 *Modo de entrega:* Delivery (valor à combinar)'
-      : '🏬 *Modo de entrega:* Retirada',
-    '',
-    'Comer bem nunca foi tão fácil! 💚'
-  );
-
-  outputEl.value = lines.join('\n');
-  outputEl.select();
 }
 
 function renderCategories() {
@@ -121,7 +94,7 @@ function renderCategories() {
   cats.forEach(cat => {
     const btn = document.createElement('button');
     btn.textContent = cat;
-    btn.className   = 'category-btn' + (cat === activeCategory ? ' active' : '');
+    btn.className = 'category-btn' + (cat === activeCategory ? ' active' : '');
     btn.addEventListener('click', () => {
       activeCategory = cat;
       renderCategories();
@@ -157,11 +130,59 @@ function renderItems() {
   });
 }
 
+// Monta apenas o corpo da mensagem (itens + total + modo)
+function generateMessage() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pt-BR', {
+    day: '2-digit', month: 'long', year: 'numeric'
+  });
+  const timeStr = now.toLocaleTimeString('pt-BR', {
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  const lines = [
+    '🛒 *Pedido Pronta Entrega Rango in Natura*',
+    `📅 ${dateStr} às ${timeStr}`,
+    ''
+  ];
+  items.forEach(item => {
+    if (item.qty > 0) lines.push(`• ${item.qty}x ${getItemName(item)}`);
+  });
+  lines.push(
+    '',
+    `💰 *Total:* ${formatBRL(calcTotal())}`,
+    orderMode === 'Delivery'
+      ? '🛵 *Modo de entrega:* Delivery (valor à combinar)'
+      : '🏬 *Modo de entrega:* Retirada',
+    '',
+    'Comer bem nunca foi tão fácil! 💚'
+  );
+
+  outputEl.value = lines.join('\n');
+}
+
+// Atualiza o rodapé com o valor e mostra/oculta conforme total
+function updateCartFooter(sum) {
+  if (sum > 0) {
+    cartFooterEl.classList.remove('hidden');
+    cartTotalEl.textContent = formatBRL(sum);
+  } else {
+    cartFooterEl.classList.add('hidden');
+    cartDetailsEl.classList.add('hidden');
+  }
+}
+
+// Ao clicar “Ver Carrinho”, monta mensagem e mostra painel
+viewCartBtn.addEventListener('click', () => {
+  generateMessage();
+  cartDetailsEl.classList.toggle('hidden');
+});
+
+// Busca dados e inicializa tudo
 async function fetchSheet() {
-  const url = `${BASE_SHEET_URL}&t=${Date.now()}`;
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
-    const res  = await fetch(url);
+    const res  = await fetch(`${BASE_SHEET_URL}&t=${Date.now()}`);
     const txt  = await res.text();
     const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
     const rows = JSON.parse(json).table.rows;
@@ -182,12 +203,13 @@ async function fetchSheet() {
 
     renderCategories();
     renderItems();
-    calcTotal();
+    const initialSum = calcTotal();
+    totalEl.textContent = formatBRL(initialSum);
+    updateCartFooter(initialSum);
   } catch(err) {
     console.error('Erro ao buscar dados:', err);
     gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
   }
 }
 
-genBtn.addEventListener('click', generateOrder);
 fetchSheet();
