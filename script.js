@@ -1,5 +1,3 @@
-// script.js
-
 const SPREADSHEET_ID = '1Ns-dGKYtrrmOfps8CSwklYp3PWjDzniahaclItoZJ1M';
 const BASE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json`;
 
@@ -7,59 +5,63 @@ let items = [];
 let activeCategory = 'Todos';
 let orderMode = 'Delivery';
 
-// Elementos gerais
 const gridEl        = document.getElementById('grid');
 const totalEl       = document.getElementById('total');
 const categoriesEl  = document.getElementById('categories');
 const template      = document.getElementById('item-template');
+
 const cartFooterEl  = document.getElementById('cart-footer');
 const cartTotalEl   = document.getElementById('cart-total');
 const viewCartBtn   = document.getElementById('view-cart');
 
-// Painel do carrinho
-const cartDetailsEl       = document.getElementById('cart-details');
-const closeCartBtn        = document.getElementById('close-cart');
-const cartItemsEl         = document.getElementById('cart-items');
-const panelTotalEl        = document.getElementById('panel-total');
-const sendOrderBtn        = document.getElementById('send-order');
+const cartDetailsEl = document.getElementById('cart-details');
+const closeCartBtn  = document.getElementById('close-cart');
+const cartItemsEl   = document.getElementById('cart-items');
+const sendOrderBtn  = document.getElementById('send-order');
 
-// Modo de pedido DENTRO do Painel
-const modeEntregaPanel    = document.getElementById('mode-entrega-panel');
-const modeRetiradaPanel   = document.getElementById('mode-retirada-panel');
+//
+// Este é o “Modo de pedido” agora DENTRO do carrinho:
+//
+const modeEntrega   = document.getElementById('mode-entrega');
+const modeRetirada  = document.getElementById('mode-retirada');
 
-// Formatação BRL
+//
+// Formata número em BRL
+//
 function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Nome do item
 function getItemName(item) {
   return item.protein && item.side
     ? `${item.protein} + ${item.side}`
     : item.protein || '';
 }
 
-// Soma total
 function calcTotal() {
   return items.reduce((sum, i) => sum + i.qty * i.price, 0);
 }
 
-// Atualiza botões de modo (no painel)
+//
+// Botões de modo de pedido
+//
 function updateModeButtons() {
-  modeEntregaPanel.classList.toggle('active', orderMode === 'Delivery');
-  modeRetiradaPanel.classList.toggle('active', orderMode === 'Retirada');
+  modeEntrega.classList.toggle('active', orderMode === 'Delivery');
+  modeRetirada.classList.toggle('active', orderMode === 'Retirada');
 }
-modeEntregaPanel.addEventListener('click', () => {
+modeEntrega.addEventListener('click', () => {
   orderMode = 'Delivery';
   updateModeButtons();
 });
-modeRetiradaPanel.addEventListener('click', () => {
+modeRetirada.addEventListener('click', () => {
   orderMode = 'Retirada';
   updateModeButtons();
 });
 updateModeButtons();
 
-// Estado de botões (+/–)
+//
+// Controle de quantidade
+//
 function updateButtonState(id) {
   const minus = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
   const plus  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
@@ -68,10 +70,10 @@ function updateButtonState(id) {
   plus.disabled  = it.qty >= it.stock;
 }
 
-// Incrementa/decrementa quantidade
 function updateQty(id, delta) {
   const it = items[id];
   it.qty = Math.max(0, it.qty + delta);
+
   const qtyEl = document.getElementById(`qty-${id}`);
   qtyEl.textContent = it.qty;
   qtyEl.classList.add('bump');
@@ -83,13 +85,15 @@ function updateQty(id, delta) {
   updateButtonState(id);
 }
 
-// Atualiza rodapé externo e interno do carrinho
+//
+// Atualiza o rodapé fixo e lista de itens no painel
+//
 function updateCartFooter(sum) {
   if (sum > 0) {
     cartFooterEl.style.display = 'flex';
-    cartTotalEl.textContent = `Total: ${formatBRL(sum)}`;
-    panelTotalEl.textContent = `Total: ${formatBRL(sum)}`;
-    // Também atualiza lista de itens
+    cartTotalEl.textContent   = `Total: ${formatBRL(sum)}`;
+
+    // Preenche dentro do painel
     cartItemsEl.innerHTML = '';
     items.forEach(it => {
       if (it.qty > 0) {
@@ -104,7 +108,9 @@ function updateCartFooter(sum) {
   }
 }
 
-// Gera a mensagem completa com data/hora
+//
+// Monta a mensagem completa com data/hora
+//
 function generateFullMessage() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', {
@@ -133,13 +139,14 @@ function generateFullMessage() {
     '',
     'Comer bem nunca foi tão fácil! 💚'
   );
-
   return lines.join('\n');
 }
 
-// Abrir e fechar painel
+//
+// Abrir / fechar painel do carrinho
+//
 function openPanel() {
-  updateModeButtons();
+  updateCartFooter(calcTotal());
   cartDetailsEl.classList.add('open');
   viewCartBtn.style.display = 'none';
 }
@@ -147,13 +154,12 @@ function closePanel() {
   cartDetailsEl.classList.remove('open');
   viewCartBtn.style.display = 'inline-block';
 }
-viewCartBtn.addEventListener('click', () => {
-  updateCartFooter(calcTotal());
-  openPanel();
-});
+viewCartBtn.addEventListener('click', openPanel);
 closeCartBtn.addEventListener('click', closePanel);
 
+//
 // Enviar pedido
+//
 sendOrderBtn.addEventListener('click', () => {
   const msg = generateFullMessage();
   const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
@@ -162,7 +168,7 @@ sendOrderBtn.addEventListener('click', () => {
   sendOrderBtn.disabled = true;
 
   window.open(waLink, '_blank');
-  navigator.clipboard.writeText(msg);
+  navigator.clipboard.writeText(msg).catch(() => {});
 
   setTimeout(() => {
     sendOrderBtn.textContent = 'Enviar Pedido';
@@ -170,7 +176,9 @@ sendOrderBtn.addEventListener('click', () => {
   }, 1200);
 });
 
-// Render categorias e cards
+//
+// Render de categorias e itens
+//
 function renderCategories() {
   const avail = new Set(items.map(i => i.category));
   const order = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
@@ -192,7 +200,8 @@ function renderCategories() {
 
 function renderItems() {
   gridEl.innerHTML = '';
-  items.filter(i => activeCategory === 'Todos' || i.category === activeCategory)
+  items
+    .filter(i => activeCategory === 'Todos' || i.category === activeCategory)
     .forEach(it => {
       const clone = template.content.cloneNode(true);
       clone.querySelector('.item-name').textContent   = getItemName(it);
@@ -204,25 +213,28 @@ function renderItems() {
       const qtyEl = clone.querySelector('.qty-display');
 
       minus.dataset.id = plus.dataset.id = it.id;
-      qtyEl.id            = `qty-${it.id}`;
-      qtyEl.textContent   = it.qty;
+      qtyEl.id = `qty-${it.id}`;
+      qtyEl.textContent = it.qty;
 
       minus.addEventListener('click', () => updateQty(it.id, -1));
-      plus .addEventListener('click', () => updateQty(it.id, +1));
+      plus.addEventListener('click',  () => updateQty(it.id, +1));
 
       gridEl.appendChild(clone);
       updateButtonState(it.id);
     });
 }
 
-// Busca do Google Sheets
+//
+// Busca no Google Sheets e inicializa tudo
+//
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
-    const res = await fetch(`${BASE_SHEET_URL}&t=${Date.now()}`);
-    const txt = await res.text();
+    const res  = await fetch(`${BASE_SHEET_URL}&t=${Date.now()}`);
+    const txt  = await res.text();
     const json = txt.slice(txt.indexOf('{'), txt.lastIndexOf('}')+1);
     const rows = JSON.parse(json).table.rows;
+
     items = rows.map((r,i) => ({
       id:       i,
       protein:  r.c[0]?.v || '',
@@ -231,8 +243,7 @@ async function fetchSheet() {
       stock:    parseInt(r.c[3]?.v,10) || 0,
       category: r.c[4]?.v || 'Refeição',
       qty:      0
-    }))
-    .filter(item =>
+    })).filter(item =>
       item.stock > 0 &&
       item.price > 0 &&
       Boolean(item.protein)
@@ -242,8 +253,8 @@ async function fetchSheet() {
     renderItems();
     totalEl.textContent = formatBRL(calcTotal());
     updateCartFooter(calcTotal());
-  } catch(err) {
-    console.error(err);
+  } catch (err) {
+    console.error('Erro ao buscar dados:', err);
     gridEl.innerHTML = '<p>Ops, não foi possível carregar o menu.</p>';
   }
 }
