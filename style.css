@@ -14,8 +14,6 @@
 * {
   box-sizing: border-box;
 }
-
-/* Remove o flash cinza no iOS */
 button {
   -webkit-tap-highlight-color: transparent;
 }
@@ -69,38 +67,6 @@ h1 {
 }
 .category-btn:not(.active):hover {
   opacity: 0.8;
-}
-
-/* === Seletor de modo === */
-.mode-options {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-}
-.mode-label {
-  font-weight: 600;
-}
-.mode-button {
-  background: transparent;
-  border: 1px solid var(--brand-orange);
-  color: var(--brand-orange);
-  padding: 0.3rem 0.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.mode-button.active {
-  background: var(--brand-orange);
-  color: #fff;
-}
-
-/* === Loader === */
-.loader {
-  text-align: center;
-  font-style: italic;
-  color: #666;
-  margin: 2rem 0;
 }
 
 /* === Grid de cards === */
@@ -169,19 +135,8 @@ h1 {
 .qty-display {
   margin: 0 0.75rem;
   font-weight: 500;
-  font-size: 1.5rem; /* igual ao tamanho dos títulos dos cards */
+  font-size: 1.5rem; /* mesmo tamanho dos títulos dos cards */
   line-height: 1;
-}
-
-/* === Sumário === */
-.summary {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-.summary p {
-  font-size: 1.2rem;
-  font-weight: 600;
 }
 
 /* === Rodapé fixo === */
@@ -218,7 +173,7 @@ h1 {
   position: fixed;
   bottom: 0;
   left: 50%;
-  transform: translate(-50%, calc(100% + 0px));
+  transform: translate(-50%, 110%);
   width: 100%;
   max-width: 480px;
   background: #fff;
@@ -281,7 +236,32 @@ h1 {
   border-bottom: 1px solid #eee;
 }
 
-/* Footer interno fixo */
+/* === Modo de pedido dentro do carrinho === */
+.mode-options-cart {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #eee;
+}
+.mode-options-cart .mode-label {
+  font-size: 1.25rem;   /* igual ao painel total */
+  font-weight: 700;
+}
+.mode-options-cart .mode-button {
+  background: transparent;
+  border: 1px solid var(--brand-orange);
+  color: var(--brand-orange);
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+.mode-options-cart .mode-button.active {
+  background: var(--brand-orange);
+  color: #fff;
+}
+
+/* === Footer interno fixo === */
 .cart-footer-panel {
   display: flex;
   justify-content: space-between;
@@ -293,8 +273,6 @@ h1 {
   font-size: 1.25rem;
   font-weight: 700;
 }
-
-/* Override botão enviar laranja */
 #send-order.button-primary {
   background-color: var(--brand-orange) !important;
   border-color: var(--brand-orange) !important;
