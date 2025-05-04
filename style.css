@@ -225,7 +225,7 @@ h1 {
 .cart-header {
   position: relative;
   background: #fff;
-  padding: 1.75rem 1rem; /* mais alto pra caber o X */
+  padding: 1.75rem 1rem; /* header mais alto */
   border-bottom: 1px solid #eee;
   z-index: 1;
 }
@@ -233,13 +233,16 @@ h1 {
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Botão fechar */
 .close-cart {
   position: absolute;
-  top: 1.75rem;
+  top: 50%;
   right: 1rem;
+  transform: translateY(-50%);
   background: transparent !important;
   border: none;
   color: #333;
