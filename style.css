@@ -143,6 +143,9 @@ h1 {
   margin-top: 1rem;
 }
 .qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 35px;
   height: 35px;
   border-radius: 8px;
@@ -150,6 +153,7 @@ h1 {
   background: transparent;
   color: #555;
   font-size: 1.2rem;
+  line-height: 1;
 }
 .qty-display {
   margin: 0 0.75rem;
@@ -220,10 +224,10 @@ h1 {
 /* Cabeçalho */
 .cart-header {
   position: relative;
-  background: #fff;            /* garante opacidade total */
-  padding: 1.5rem 1rem;         /* header mais alto */
+  background: #fff;
+  padding: 1.75rem 1rem; /* mais alto pra caber o X */
   border-bottom: 1px solid #eee;
-  z-index: 1;                   /* fixa sobre itens */
+  z-index: 1;
 }
 .cart-header h3 {
   font-size: 1.5rem;
@@ -234,9 +238,9 @@ h1 {
 /* Botão fechar */
 .close-cart {
   position: absolute;
-  top: 1.5rem;                 /* mesmo top do padding */
+  top: 1.75rem;
   right: 1rem;
-  background: transparent;
+  background: transparent !important;
   border: none;
   color: #333;
   font-size: 1.5rem;
