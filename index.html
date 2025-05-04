@@ -32,9 +32,7 @@
 
     <div id="grid" class="grid"></div>
 
-    <div class="summary">
-      <p>Total: <strong id="total">R$ 0,00</strong></p>
-    </div>
+    <!-- resumo externo removido -->
   </main>
 
   <!-- Rodapé fixo -->
@@ -49,18 +47,15 @@
       <h3>Seu Carrinho</h3>
       <button id="close-cart" class="close-cart">&times;</button>
     </div>
-
     <div class="cart-items-container">
       <ul id="cart-items" class="cart-items"></ul>
     </div>
-
-    <!-- MODO DE PEDIDO AGORA DENTRO DO PAINEL -->
-    <div class="mode-options cart-mode-options">
+    <!-- Modo de pedido agora dentro do carrinho -->
+    <div class="mode-options-cart">
       <span class="mode-label">Modo de pedido:</span>
-      <button id="mode-entrega-panel" class="mode-button">Delivery</button>
-      <button id="mode-retirada-panel" class="mode-button">Retirada</button>
+      <button type="button" id="mode-entrega" class="mode-button">Delivery</button>
+      <button type="button" id="mode-retirada" class="mode-button">Retirada</button>
     </div>
-
     <div class="cart-footer-panel">
       <span id="panel-total">Total: R$ 0,00</span>
       <button id="send-order" class="button-primary">
