@@ -52,7 +52,7 @@ function updateButtonState(id){
 
 function updateQty(id,delta){
   const it = items[id];
-  it.qty = Math.max(0, it.qty+delta);
+  it.qty = Math.max(0,it.qty+delta);
   const qtyEl = document.getElementById(`qty-${id}`);
   qtyEl.textContent = it.qty;
   qtyEl.classList.add('bump');
