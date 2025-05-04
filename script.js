@@ -6,7 +6,6 @@ let activeCategory = 'Todos';
 let orderMode = 'Delivery';
 
 const gridEl        = document.getElementById('grid');
-const totalEl       = document.getElementById('total');
 const categoriesEl  = document.getElementById('categories');
 const template      = document.getElementById('item-template');
 
@@ -19,15 +18,10 @@ const closeCartBtn  = document.getElementById('close-cart');
 const cartItemsEl   = document.getElementById('cart-items');
 const sendOrderBtn  = document.getElementById('send-order');
 
-//
-// Este é o “Modo de pedido” agora DENTRO do carrinho:
-//
 const modeEntrega   = document.getElementById('mode-entrega');
 const modeRetirada  = document.getElementById('mode-retirada');
+const panelTotalEl  = document.getElementById('panel-total');
 
-//
-// Formata número em BRL
-//
 function formatBRL(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
@@ -42,26 +36,16 @@ function calcTotal() {
   return items.reduce((sum, i) => sum + i.qty * i.price, 0);
 }
 
-//
-// Botões de modo de pedido
-//
+// ——— Modo de pedido ———
 function updateModeButtons() {
   modeEntrega.classList.toggle('active', orderMode === 'Delivery');
   modeRetirada.classList.toggle('active', orderMode === 'Retirada');
 }
-modeEntrega.addEventListener('click', () => {
-  orderMode = 'Delivery';
-  updateModeButtons();
-});
-modeRetirada.addEventListener('click', () => {
-  orderMode = 'Retirada';
-  updateModeButtons();
-});
+modeEntrega.addEventListener('click', () => { orderMode = 'Delivery'; updateModeButtons(); });
+modeRetirada.addEventListener('click', () => { orderMode = 'Retirada'; updateModeButtons(); });
 updateModeButtons();
 
-//
-// Controle de quantidade
-//
+// ——— Quantidade ———
 function updateButtonState(id) {
   const minus = document.querySelector(`.qty-btn.minus[data-id="${id}"]`);
   const plus  = document.querySelector(`.qty-btn.plus[data-id="${id}"]`);
@@ -80,20 +64,17 @@ function updateQty(id, delta) {
   qtyEl.addEventListener('animationend', () => qtyEl.classList.remove('bump'), { once: true });
 
   const sum = calcTotal();
-  totalEl.textContent = formatBRL(sum);
   updateCartFooter(sum);
   updateButtonState(id);
 }
 
-//
-// Atualiza o rodapé fixo e lista de itens no painel
-//
+// ——— Atualiza rodapé fixo + painel ———
 function updateCartFooter(sum) {
   if (sum > 0) {
     cartFooterEl.style.display = 'flex';
-    cartTotalEl.textContent   = `Total: ${formatBRL(sum)}`;
+    cartTotalEl.textContent     = `Total: ${formatBRL(sum)}`;
+    panelTotalEl.textContent    = `Total: ${formatBRL(sum)}`;
 
-    // Preenche dentro do painel
     cartItemsEl.innerHTML = '';
     items.forEach(it => {
       if (it.qty > 0) {
@@ -108,9 +89,7 @@ function updateCartFooter(sum) {
   }
 }
 
-//
-// Monta a mensagem completa com data/hora
-//
+// ——— Gera mensagem final ———
 function generateFullMessage() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-BR', {
@@ -142,9 +121,7 @@ function generateFullMessage() {
   return lines.join('\n');
 }
 
-//
-// Abrir / fechar painel do carrinho
-//
+// ——— Abre / Fecha painel ———
 function openPanel() {
   updateCartFooter(calcTotal());
   cartDetailsEl.classList.add('open');
@@ -157,28 +134,24 @@ function closePanel() {
 viewCartBtn.addEventListener('click', openPanel);
 closeCartBtn.addEventListener('click', closePanel);
 
-//
-// Enviar pedido
-//
+// ——— Envio WhatsApp ———
 sendOrderBtn.addEventListener('click', () => {
   const msg = generateFullMessage();
   const waLink = `https://wa.me/5598983540048?text=${encodeURIComponent(msg)}`;
 
   sendOrderBtn.textContent = '⏳ Enviando…';
-  sendOrderBtn.disabled = true;
+  sendOrderBtn.disabled    = true;
 
   window.open(waLink, '_blank');
   navigator.clipboard.writeText(msg).catch(() => {});
 
   setTimeout(() => {
     sendOrderBtn.textContent = 'Enviar Pedido';
-    sendOrderBtn.disabled = false;
+    sendOrderBtn.disabled    = false;
   }, 1200);
 });
 
-//
-// Render de categorias e itens
-//
+// ——— Renderiza categorias e itens ———
 function renderCategories() {
   const avail = new Set(items.map(i => i.category));
   const order = ['Todos','Refeições','Cremes','Lanches','Sobremesas'];
@@ -187,7 +160,7 @@ function renderCategories() {
     if (cat === 'Todos' || avail.has(cat)) {
       const btn = document.createElement('button');
       btn.textContent = cat;
-      btn.className = 'category-btn' + (cat === activeCategory ? ' active' : '');
+      btn.className   = 'category-btn' + (cat === activeCategory ? ' active' : '');
       btn.addEventListener('click', () => {
         activeCategory = cat;
         renderCategories();
@@ -213,7 +186,7 @@ function renderItems() {
       const qtyEl = clone.querySelector('.qty-display');
 
       minus.dataset.id = plus.dataset.id = it.id;
-      qtyEl.id = `qty-${it.id}`;
+      qtyEl.id        = `qty-${it.id}`;
       qtyEl.textContent = it.qty;
 
       minus.addEventListener('click', () => updateQty(it.id, -1));
@@ -224,9 +197,7 @@ function renderItems() {
     });
 }
 
-//
-// Busca no Google Sheets e inicializa tudo
-//
+// ——— Busca dados e inicializa ———
 async function fetchSheet() {
   gridEl.innerHTML = '<p class="loader">Carregando menu…</p>';
   try {
@@ -251,7 +222,6 @@ async function fetchSheet() {
 
     renderCategories();
     renderItems();
-    totalEl.textContent = formatBRL(calcTotal());
     updateCartFooter(calcTotal());
   } catch (err) {
     console.error('Erro ao buscar dados:', err);
