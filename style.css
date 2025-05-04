@@ -11,7 +11,14 @@
   --disabled-color:  #999;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+
+/* Remove o flash cinza no iOS */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
 
 body {
   background: var(--bg-offwhite);
@@ -72,7 +79,9 @@ h1 {
   margin-bottom: 1rem;
   font-size: 0.95rem;
 }
-.mode-label { font-weight: 600; }
+.mode-label {
+  font-weight: 600;
+}
 .mode-button {
   background: transparent;
   border: 1px solid var(--brand-orange);
@@ -211,11 +220,13 @@ h1 {
 /* Cabeçalho */
 .cart-header {
   position: relative;
-  padding: 1.25rem 1rem;      /* Header maior para acomodar o X */
+  background: #fff;            /* garante opacidade total */
+  padding: 1.5rem 1rem;         /* header mais alto */
   border-bottom: 1px solid #eee;
+  z-index: 1;                   /* fixa sobre itens */
 }
 .cart-header h3 {
-  font-size: 1.5rem;          /* Título maior */
+  font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
 }
@@ -223,9 +234,9 @@ h1 {
 /* Botão fechar */
 .close-cart {
   position: absolute;
-  top: 1.25rem;               /* Mesmo padding do header */
+  top: 1.5rem;                 /* mesmo top do padding */
   right: 1rem;
-  background: transparent;    /* Remove roxo */
+  background: transparent;
   border: none;
   color: #333;
   font-size: 1.5rem;
@@ -237,6 +248,7 @@ h1 {
   flex: 1;
   overflow-y: auto;
   padding: 0.5rem 1rem;
+  z-index: 0;
 }
 .cart-items {
   list-style: none;
@@ -244,7 +256,7 @@ h1 {
   padding: 0;
 }
 .cart-items li {
-  font-size: 1.5rem;          /* Igual ao título dos cards */
+  font-size: 1.5rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid #eee;
 }
@@ -270,5 +282,7 @@ h1 {
 }
 
 @media (min-width: 600px) {
-  .grid { grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  }
 }
