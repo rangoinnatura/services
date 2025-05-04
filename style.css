@@ -211,11 +211,11 @@ h1 {
 /* Cabeçalho */
 .cart-header {
   position: relative;
-  padding: 1rem 1rem;
+  padding: 1.25rem 1rem;      /* Header maior para acomodar o X */
   border-bottom: 1px solid #eee;
 }
 .cart-header h3 {
-  font-size: 1.5rem;
+  font-size: 1.5rem;          /* Título maior */
   font-weight: 600;
   margin: 0;
 }
@@ -223,9 +223,13 @@ h1 {
 /* Botão fechar */
 .close-cart {
   position: absolute;
-  top: 1rem;
+  top: 1.25rem;               /* Mesmo padding do header */
   right: 1rem;
+  background: transparent;    /* Remove roxo */
+  border: none;
+  color: #333;
   font-size: 1.5rem;
+  cursor: pointer;
 }
 
 /* Itens roláveis */
@@ -240,7 +244,7 @@ h1 {
   padding: 0;
 }
 .cart-items li {
-  font-size: 1rem;
+  font-size: 1.5rem;          /* Igual ao título dos cards */
   padding: 0.5rem 0;
   border-bottom: 1px solid #eee;
 }
