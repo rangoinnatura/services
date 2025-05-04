@@ -154,10 +154,23 @@ h1 {
   color: #555;
   font-size: 1.2rem;
   line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.qty-btn:hover:not(:disabled) {
+  border-color: #888;
+}
+.qty-btn:disabled {
+  background-color: var(--disabled-bg) !important;
+  border-color: var(--disabled-border) !important;
+  color: var(--disabled-color) !important;
+  cursor: not-allowed;
 }
 .qty-display {
   margin: 0 0.75rem;
   font-weight: 500;
+  font-size: 1.5rem; /* igual ao tamanho dos títulos dos cards */
+  line-height: 1;
 }
 
 /* === Sumário === */
@@ -225,7 +238,7 @@ h1 {
 .cart-header {
   position: relative;
   background: #fff;
-  padding: 1.75rem 1rem; /* header mais alto */
+  padding: 1.75rem 1rem;
   border-bottom: 1px solid #eee;
   z-index: 1;
 }
