@@ -210,7 +210,7 @@ async function fetchSheet() {
       id:       i,
       protein:  r.c[0]?.v || '',
       side:     r.c[1]?.v || '',
-      price:    parseFloat(r.c[2]?.v) || 0,
+      price: parseFloat(String(r.c[2]?.v).replace(/[^\d,.-]/g, '').replace(',', '.')) || 0,
       stock:    parseInt(r.c[3]?.v,10) || 0,
       category: r.c[4]?.v || 'Refeição',
       qty:      0
